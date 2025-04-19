@@ -11,6 +11,8 @@ import Welcome from '../components/manager/Welcome.vue';
 import Post from '../components/manager/Post.vue';
 import Theme from  '../components/manager/Theme.vue';
 import Tag from '../components/manager/Tag.vue';
+import Team from '../components/manager/Team.vue';
+import Application from '../components/manager/Application.vue';
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -68,6 +70,18 @@ const router = createRouter({
                     name: 'Tag',
                     meta: {name: '标签管理'},
                     component: Tag,
+                },
+                {
+                    path: 'team',
+                    name: 'Team',
+                    meta: {name: '队伍管理'},
+                    component: Team,
+                },
+                {
+                    path: 'application',
+                    name: 'Application',
+                    meta: {name: '申请管理'},
+                    component: Team,
                 }
             ],
         },

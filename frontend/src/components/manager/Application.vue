@@ -2,7 +2,7 @@
     <div>
         <!-- 查询区域 -->
         <div class="search" style="padding-bottom: 20px">
-            <el-autocomplete v-model="themeName" :fetch-suggestions="querySearch" :trigger-on-focus="false"
+            <el-autocomplete v-model="themeName" :fetch-suggestions="querySearchTheme" :trigger-on-focus="false"
                 clearable class="inline-input w-50" style="width: 200px" placeholder="请输入主题名称查询" />
             <el-button type="info" plain style="margin-left: 10px" @click="search(1)">查询</el-button>
             <el-button type="warning" plain style="margin-left: 10px" @click="reset">重置</el-button>
@@ -58,7 +58,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, computed } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import request from "../../utils/request"; // 替换为实际的请求工具
 
@@ -182,7 +182,7 @@ const del = (id) => {
         cancelButtonText: "取消"
     }).then(() => {
         request
-            .delete("/admin/theme/delete", { data: { id } })
+            .post("/admin/theme/delete", { id })
             .then((res) => {
                 if (res.code === 1) {
                     ElMessage.success("操作成功");
@@ -213,7 +213,7 @@ const delBatch = () => {
         cancelButtonText: "取消"
     }).then(() => {
         request
-            .delete("/admin/theme/delete/batch", { data: { ids: ids.value } })
+            .post("/admin/theme/delete/batch", { ids: ids.value })
             .then((res) => {
                 console.log(res.code);
                 if (res.code === 1) {
@@ -230,7 +230,7 @@ const delBatch = () => {
 };
 
 // 自动补全查询
-const querySearch = (queryString, cb) => {
+const querySearchTheme = (queryString, cb) => {
     let results = [];
     request
         .get("/admin/theme/querySearch", {
