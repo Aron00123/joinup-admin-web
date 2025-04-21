@@ -143,7 +143,7 @@ const handleEdit = (row) => {
 const save = () => {
     // console.log(form)
     
-    request.put(`/admin/theme/update/${form.id}`, {
+    request.put(`/admin/user/update/${form.id}`, {
         username: form.username,
         password: form.password,
         gender: form.gender,
