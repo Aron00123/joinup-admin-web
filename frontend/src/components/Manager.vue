@@ -76,6 +76,7 @@
             </template>
             <el-menu-item index="/theme">主题管理</el-menu-item>
             <el-menu-item index="/tag">标签管理</el-menu-item>
+            <el-menu-item index="/announcement">公告管理</el-menu-item>
           </el-sub-menu>
 
           <el-sub-menu index="reserve" v-if="user.role === 'ADMIN'">

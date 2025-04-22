@@ -2,8 +2,8 @@
     <div>
         <!-- 查询区域 -->
         <div class="search" style="padding-bottom: 20px">
-            <el-autocomplete v-model="tagName" :fetch-suggestions="querySearch" :trigger-on-focus="false"
-                clearable class="inline-input w-50" style="width: 200px" placeholder="请输入标签名称查询" />
+            <el-autocomplete v-model="announcementName" :fetch-suggestions="querySearch" :trigger-on-focus="false"
+                clearable class="inline-input w-50" style="width: 200px" placeholder="请输入主题名称查询" />
             <el-button type="info" plain style="margin-left: 10px" @click="search(1)">查询</el-button>
             <el-button type="warning" plain style="margin-left: 10px" @click="reset">重置</el-button>
         </div>
@@ -19,8 +19,24 @@
             <el-table :data="tableData" stripe @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center" />
                 <el-table-column prop="id" label="序号" width="70" align="center" sortable />
-                <el-table-column prop="name" label="名称" show-overflow-tooltip />
-                <el-table-column prop="description" label="描述" show-overflow-tooltip />
+                <el-table-column prop="cover" label="封面" width="80" align="center">
+                    <template #default="scope">
+                        <!-- 把 URL 先显示出来，看控制台或表格里长什么样 -->
+                        <!-- <div style="font-size:12px; color:#999; margin-bottom:4px;">
+                            URL: {{ scope.row.photo }}
+                        </div> -->
+                        <el-image
+                        :src="scope.row.cover || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'"
+                        fit="cover"
+                        :zoom-rate="1.2"
+                        :max-scale="7"
+                        :min-scale="0.2"
+                        style="width: 50px; height: 50px; border-radius: 0;"
+                        />
+                    </template>
+                </el-table-column>
+                <el-table-column prop="title" label="标题" show-overflow-tooltip />
+                <el-table-column prop="content" label="内容" show-overflow-tooltip />
                 <el-table-column prop="createTime" label="创建时间" />
                 <el-table-column prop="updateTime" label="更新时间" />
 
@@ -39,13 +55,16 @@
         </div>
 
         <!-- 新增/编辑对话框 -->
-        <el-dialog title="标签信息" v-model="formVisible" width="40%" :close-on-click-modal="false" destroy-on-close>
+        <el-dialog title="主题信息" v-model="formVisible" width="40%" :close-on-click-modal="false" destroy-on-close>
             <el-form :model="form" label-width="150px" style="padding-right: 50px" :rules="rules" ref="formRef">
-                <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name" placeholder="名称"></el-input>
+                <el-form-item label="标题" prop="name">
+                    <el-input v-model="form.title" placeholder="主题名称"></el-input>
                 </el-form-item>
-                <el-form-item label="描述" prop="description">
-                    <el-input type="textarea" rows="3" v-model="form.description" placeholder="描述"></el-input>
+                <el-form-item label="内容" prop="description">
+                    <el-input type="textarea" rows="3" v-model="form.content" placeholder="主题描述"></el-input>
+                </el-form-item>
+                <el-form-item label="封面" prop="description">
+                    <el-input type="textarea" rows="3" v-model="form.cover" placeholder="主题描述"></el-input>
                 </el-form-item>
 
             </el-form>
@@ -70,7 +89,7 @@ const pageSize = ref(10);
 const total = ref(0);
 
 // 查询条件
-const tagName = ref("");
+const announcementName = ref("");
 
 // 对话框相关
 const formVisible = ref(false);
@@ -83,7 +102,7 @@ const ids = ref([]);
 const load = (page = 1) => {
     pageNum.value = page;
     request
-        .get("/admin/tag/count", {
+        .get("/admin/message/announcement/count", {
         })
         .then((res) => {
             console.log(res);
@@ -93,7 +112,7 @@ const load = (page = 1) => {
             ElMessage.error("请求失败，请稍后重试");
         });
     request
-        .get("/admin/tag/list", {
+        .get("/admin/message/announcement/list", {
             params: {
                 page: pageNum.value,               // 第 1 页
                 size: pageSize.value,              // 每页 10 条
@@ -112,7 +131,7 @@ const load = (page = 1) => {
 
 // 分页切换
 const handleCurrentChange = (page) => {
-    if (tagName.value && tagName.value !== "") {
+    if (announcementName.value && announcementName.value !== "") {
         search(page);
     } else {
         load(page);
@@ -139,9 +158,10 @@ const handleEdit = (row) => {
 // 保存（新增或编辑）
 const save = () => {
     if (isHandleAdd.value) {
-        request.post("/admin/tag/add", {
-            name: form.name,
-            description: form.description
+        request.post("/admin/message/announcement/add", {
+            title: form.title,
+            content: form.content,
+            cover: form.cover
         }).then(res => {
             if (res.code === 1) {
                 ElMessage.success('保存成功');
@@ -154,9 +174,10 @@ const save = () => {
         isHandleAdd.value = false;
     }
     else {
-        request.put(`/admin/tag/update/${form.id}`, {
-            name: form.name,
-            description: form.description
+        request.put(`/admin/message/announcement/update/${form.id}`, {
+            title: form.title,
+            content: form.content,
+            cover: form.cover
         }).then(res => {
             if (res.code === 1) {
                 ElMessage.success('保存成功');
@@ -183,7 +204,7 @@ const del = (id) => {
         cancelButtonText: "取消"
     }).then(() => {
         request
-            .delete("/admin/tag/delete", { data: { id } })
+            .delete("/admin/message/announcement/delete", { data: { id } })
             .then((res) => {
                 if (res.code === 1) {
                     ElMessage.success("操作成功");
@@ -214,7 +235,7 @@ const delBatch = () => {
         cancelButtonText: "取消"
     }).then(() => {
         request
-            .delete("/admin/tag/delete/batch", { data: { ids: ids.value } })
+            .delete("/admin/message/announcement/delete/batch", { data: { ids: ids.value } })
             .then((res) => {
                 console.log(res.code);
                 if (res.code === 1) {
@@ -234,7 +255,7 @@ const delBatch = () => {
 const querySearch = (queryString, cb) => {
     let results = [];
     request
-        .get("/admin/tag/querySearch", {
+        .get("/admin/message/announcement/querySearch", {
             params: { name: queryString }    // 注意是 params，不是 body
         })
         .then((res) => {
@@ -257,9 +278,9 @@ const querySearch = (queryString, cb) => {
 const search = (page) => {
     if (page) pageNum.value = page;
     request
-        .get("/admin/tag/searchCount", {
+        .get("/admin/message/announcement/searchCount", {
             params: {
-                name: tagName.value
+                name: announcementName.value
             }
         })
         .then((res) => {
@@ -270,9 +291,9 @@ const search = (page) => {
             ElMessage.error("请求失败，请稍后重试");
         });
     request
-        .get("/admin/tag/search", {
+        .get("/admin/message/announcement/search", {
             params: {
-                name: tagName.value,
+                name: announcementName.value,
                 page: pageNum.value,               // 第 1 页
                 size: pageSize.value,              // 每页 10 条
                 // sort: 'create_time,desc',
@@ -290,7 +311,7 @@ const search = (page) => {
 
 // 重置查询条件
 const reset = () => {
-    tagName.value = "";
+    announcementName.value = "";
     load(1);
 };
 

@@ -19,8 +19,8 @@
             <el-table :data="tableData" stripe @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center" />
                 <el-table-column prop="id" label="序号" width="70" align="center" sortable />
-                <el-table-column prop="name" label="主题名" show-overflow-tooltip />
-                <el-table-column prop="description" label="主题描述" show-overflow-tooltip />
+                <el-table-column prop="name" label="名称" show-overflow-tooltip />
+                <el-table-column prop="description" label="描述" show-overflow-tooltip />
                 <el-table-column prop="createTime" label="创建时间" />
 
                 <el-table-column label="操作" align="center" width="180">
@@ -40,11 +40,11 @@
         <!-- 新增/编辑对话框 -->
         <el-dialog title="主题信息" v-model="formVisible" width="40%" :close-on-click-modal="false" destroy-on-close>
             <el-form :model="form" label-width="150px" style="padding-right: 50px" :rules="rules" ref="formRef">
-                <el-form-item label="主题名称" prop="name">
-                    <el-input v-model="form.name" placeholder="主题名称"></el-input>
+                <el-form-item label="名称" prop="name">
+                    <el-input v-model="form.name" placeholder="名称"></el-input>
                 </el-form-item>
-                <el-form-item label="主题描述" prop="description">
-                    <el-input type="textarea" rows="3" v-model="form.description" placeholder="主题描述"></el-input>
+                <el-form-item label="描述" prop="description">
+                    <el-input type="textarea" rows="3" v-model="form.description" placeholder="描述"></el-input>
                 </el-form-item>
 
             </el-form>

@@ -13,6 +13,7 @@ import Theme from  '../components/manager/Theme.vue';
 import Tag from '../components/manager/Tag.vue';
 import Team from '../components/manager/Team.vue';
 import Application from '../components/manager/Application.vue';
+import Announcement from '../components/manager/Announcement.vue';
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -82,6 +83,12 @@ const router = createRouter({
                     name: 'Application',
                     meta: {name: '申请管理'},
                     component: Team,
+                },
+                {
+                    path: 'announcement',
+                    name: 'Announcement',
+                    meta: {name: '公告管理'},
+                    component: Announcement,
                 }
             ],
         },
