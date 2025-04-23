@@ -2,15 +2,14 @@
     <div>
         <!-- 查询区域 -->
         <div class="search" style="padding-bottom: 20px">
-            <el-autocomplete v-model="themeName" :fetch-suggestions="querySearchTheme" :trigger-on-focus="false"
-                clearable class="inline-input w-50" style="width: 200px" placeholder="请输入主题名称查询" />
+            <el-autocomplete v-model="teamName" :fetch-suggestions="querySearch" :trigger-on-focus="false"
+                clearable class="inline-input w-50" style="width: 200px" placeholder="请输入队伍名称查询" />
             <el-button type="info" plain style="margin-left: 10px" @click="search(1)">查询</el-button>
             <el-button type="warning" plain style="margin-left: 10px" @click="reset">重置</el-button>
         </div>
 
         <!-- 操作区域 -->
         <div class="operation" style="padding-bottom: 20px">
-            <el-button type="primary" plain @click="handleAdd">新增</el-button>
             <el-button type="danger" plain @click="delBatch">批量删除</el-button>
         </div>
 
@@ -19,9 +18,12 @@
             <el-table :data="tableData" stripe @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center" />
                 <el-table-column prop="id" label="序号" width="70" align="center" sortable />
-                <el-table-column prop="name" label="主题名" show-overflow-tooltip />
-                <el-table-column prop="description" label="主题描述" show-overflow-tooltip />
-                <el-table-column prop="createTime" label="创建时间" />
+                <el-table-column prop="name" label="名称" show-overflow-tooltip />
+                <el-table-column prop="description" label="介绍" show-overflow-tooltip />
+                <el-table-column prop="maxMembers" label="最大人数" show-overflow-tooltip />
+                <el-table-column prop="open" label="是否公开" />
+                <el-table-column prop="themeId" label="主题" sortable />
+                <el-table-column prop="tagIds" label="标签" />
 
                 <el-table-column label="操作" align="center" width="180">
                     <template #default="{ row }">
@@ -37,14 +39,26 @@
             </div>
         </div>
 
-        <!-- 新增/编辑对话框 -->
-        <el-dialog title="主题信息" v-model="formVisible" width="40%" :close-on-click-modal="false" destroy-on-close>
+        <!-- 编辑对话框 -->
+        <el-dialog title="队伍信息" v-model="formVisible" width="40%" :close-on-click-modal="false" destroy-on-close>
             <el-form :model="form" label-width="150px" style="padding-right: 50px" :rules="rules" ref="formRef">
-                <el-form-item label="主题名称" prop="name">
-                    <el-input v-model="form.name" placeholder="主题名称"></el-input>
+                <el-form-item label="名称" prop="name">
+                    <el-input v-model="form.name" placeholder="名称"></el-input>
                 </el-form-item>
-                <el-form-item label="主题描述" prop="description">
-                    <el-input type="textarea" rows="3" v-model="form.description" placeholder="主题描述"></el-input>
+                <el-form-item label="介绍" prop="description">
+                    <el-input type="textarea" rows="3" v-model="form.description" placeholder="介绍"></el-input>
+                </el-form-item>
+                <el-form-item label="最大人数" prop="maxMembers">
+                    <el-input type="textarea" rows="1" v-model="form.maxMembers" placeholder="最大人数"></el-input>
+                </el-form-item>
+                <el-form-item label="是否公开" prop="open">
+                    <el-input type="textarea" rows="1" v-model="form.open" placeholder="是否公开"></el-input>
+                </el-form-item>
+                <el-form-item label="主题" prop="themeId">
+                    <el-input type="textarea" rows="1" v-model="form.themeId" placeholder="主题"></el-input>
+                </el-form-item>
+                <el-form-item label="标签" prop="tagIds">
+                    <el-input type="textarea" rows="2" v-model="form.tagIds" placeholder="标签"></el-input>
                 </el-form-item>
 
             </el-form>
@@ -58,7 +72,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import request from "../../utils/request"; // 替换为实际的请求工具
 
@@ -69,11 +83,10 @@ const pageSize = ref(10);
 const total = ref(0);
 
 // 查询条件
-const themeName = ref("");
+const teamName = ref("");
 
 // 对话框相关
 const formVisible = ref(false);
-const isHandleAdd = ref(false);
 const form = reactive({});
 const rules = reactive({});
 const ids = ref([]);
@@ -82,7 +95,7 @@ const ids = ref([]);
 const load = (page = 1) => {
     pageNum.value = page;
     request
-        .get("/admin/theme/count", {
+        .get("/admin/team/count", {
         })
         .then((res) => {
             console.log(res);
@@ -92,7 +105,7 @@ const load = (page = 1) => {
             ElMessage.error("请求失败，请稍后重试");
         });
     request
-        .get("/admin/theme/list", {
+        .get("/admin/team/list", {
             params: {
                 page: pageNum.value,               // 第 1 页
                 size: pageSize.value,              // 每页 10 条
@@ -111,21 +124,11 @@ const load = (page = 1) => {
 
 // 分页切换
 const handleCurrentChange = (page) => {
-    if (themeName.value && themeName.value !== "") {
+    if (teamName.value && teamName.value !== "") {
         search(page);
     } else {
         load(page);
     }
-};
-
-// 新增处理
-const handleAdd = () => {
-    Object.assign(form, {}); // 清空 form 对象
-    Object.keys(form).forEach((key) => {
-        form[key] = null;
-    });
-    formVisible.value = true;
-    isHandleAdd.value = true;
 };
 
 // 编辑处理
@@ -135,43 +138,27 @@ const handleEdit = (row) => {
 };
 
 
-// 保存（新增或编辑）
+// 保存（编辑）
 const save = () => {
-    if (isHandleAdd.value) {
-        request.post("/admin/theme/add", {
-            name: form.name,
-            description: form.description
-        }).then(res => {
-            if (res.code === 1) {
-                ElMessage.success('保存成功');
-                load(1);
-                formVisible.value = false;
-            } else {
-                ElMessage.error(res.msg);
-            }
-        }).catch(() => ElMessage.error('请求失败，请稍后重试'));
-        isHandleAdd.value = false;
-    }
-    else {
-        request.put(`/admin/theme/update/${form.id}`, {
-            name: form.name,
-            description: form.description
-        }).then(res => {
-            if (res.code === 1) {
-                ElMessage.success('保存成功');
-                load(1);
-                formVisible.value = false;
-            } else {
-                ElMessage.error(res.msg);
-            }
-        }).catch(() => ElMessage.error('请求失败，请稍后重试'));
-    }
+    
+    request.put(`/admin/team/update/${form.id}`, {
+        name: form.name,
+        description: form.description
+    }).then(res => {
+        if (res.code === 1) {
+            ElMessage.success('保存成功');
+            load(1);
+            formVisible.value = false;
+        } else {
+            ElMessage.error(res.msg);
+        }
+    }).catch(() => ElMessage.error('请求失败，请稍后重试'));
+    
 };
 
 // 关闭对话框
 const closeDialog = () => {
     formVisible.value = false;
-    isHandleAdd.value = false;
 };
 
 // 删除单条数据
@@ -182,7 +169,7 @@ const del = (id) => {
         cancelButtonText: "取消"
     }).then(() => {
         request
-            .post("/admin/theme/delete", { id })
+            .delete("/admin/team/delete", { data: { id } })
             .then((res) => {
                 if (res.code === 1) {
                     ElMessage.success("操作成功");
@@ -213,7 +200,7 @@ const delBatch = () => {
         cancelButtonText: "取消"
     }).then(() => {
         request
-            .post("/admin/theme/delete/batch", { ids: ids.value })
+            .delete("/admin/team/delete/batch", { data: { ids: ids.value } })
             .then((res) => {
                 console.log(res.code);
                 if (res.code === 1) {
@@ -230,10 +217,10 @@ const delBatch = () => {
 };
 
 // 自动补全查询
-const querySearchTheme = (queryString, cb) => {
+const querySearch = (queryString, cb) => {
     let results = [];
     request
-        .get("/admin/theme/querySearch", {
+        .get("/admin/team/querySearch", {
             params: { name: queryString }    // 注意是 params，不是 body
         })
         .then((res) => {
@@ -256,9 +243,9 @@ const querySearchTheme = (queryString, cb) => {
 const search = (page) => {
     if (page) pageNum.value = page;
     request
-        .get("/admin/theme/searchCount", {
+        .get("/admin/team/searchCount", {
             params: {
-                name: themeName.value
+                name: teamName.value
             }
         })
         .then((res) => {
@@ -269,9 +256,9 @@ const search = (page) => {
             ElMessage.error("请求失败，请稍后重试");
         });
     request
-        .get("/admin/theme/search", {
+        .get("/admin/team/search", {
             params: {
-                name: themeName.value,
+                name: teamName.value,
                 page: pageNum.value,               // 第 1 页
                 size: pageSize.value,              // 每页 10 条
                 // sort: 'create_time,desc',
@@ -289,7 +276,7 @@ const search = (page) => {
 
 // 重置查询条件
 const reset = () => {
-    themeName.value = "";
+    teamName.value = "";
     load(1);
 };
 

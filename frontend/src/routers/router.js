@@ -8,12 +8,12 @@ import AdminPerson from '../components/manager/AdminPerson.vue';
 import Password from '../components/manager/Password.vue';
 import Notice from '../components/manager/Notice.vue';
 import Welcome from '../components/manager/Welcome.vue';
-import Post from '../components/manager/Post.vue';
 import Theme from  '../components/manager/Theme.vue';
 import Tag from '../components/manager/Tag.vue';
 import Team from '../components/manager/Team.vue';
 import Application from '../components/manager/Application.vue';
 import Announcement from '../components/manager/Announcement.vue';
+import TeamMember  from '../components/manager/TeamMember.vue';
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -55,12 +55,6 @@ const router = createRouter({
                     component: Notice,
                 },
                 {
-                    path: 'post',
-                    name: 'Post',
-                    meta: {name: '帖子管理'},
-                    component: Post,
-                },
-                {
                     path: 'theme',
                     name: 'Theme',
                     meta: {name: '主题管理'},
@@ -82,13 +76,19 @@ const router = createRouter({
                     path: 'application',
                     name: 'Application',
                     meta: {name: '申请管理'},
-                    component: Team,
+                    component: Application,
                 },
                 {
                     path: 'announcement',
                     name: 'Announcement',
                     meta: {name: '公告管理'},
                     component: Announcement,
+                },
+                {
+                    path: 'teamMember',
+                    name: 'TeamMember',
+                    meta: {name: '成员管理'},
+                    component: TeamMember,
                 }
             ],
         },

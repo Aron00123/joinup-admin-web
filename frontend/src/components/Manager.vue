@@ -76,6 +76,7 @@
             </template>
             <el-menu-item index="/theme">主题管理</el-menu-item>
             <el-menu-item index="/tag">标签管理</el-menu-item>
+            <el-menu-item index="/application">申请管理</el-menu-item>
             <el-menu-item index="/announcement">公告管理</el-menu-item>
           </el-sub-menu>
 
@@ -86,9 +87,9 @@
               </el-icon>
               <i class="el-icon-menu"></i><span><strong>组队管理</strong></span>
             </template>
-            <el-menu-item index="/post">帖子管理</el-menu-item>
-            <el-menu-item index="/theme">队伍管理</el-menu-item>
-            <el-menu-item index="/application">申请管理</el-menu-item>
+            <el-menu-item index="/team">队伍管理</el-menu-item>
+            <el-menu-item index="/teamMember">成员管理</el-menu-item>
+            
           </el-sub-menu>
 
 
