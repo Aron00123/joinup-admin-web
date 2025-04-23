@@ -18,12 +18,20 @@
                 <el-table-column type="selection" width="55" align="center" />
                 <el-table-column prop="id" label="序号" width="50" sortable />
                 <el-table-column prop="username" label="用户名" width="180" align="center" />
-                <el-table-column label="头像" width="80" align="center">
-                    <template #default="{ row }">
+                <el-table-column prop="cover" label="头像" width="80" align="center">
+                    <template #default="scope">
+                        <!-- 把 URL 先显示出来，看控制台或表格里长什么样 -->
+                        <!-- <div style="font-size:12px; color:#999; margin-bottom:4px;">
+                            URL: {{ scope.row.photo }}
+                        </div> -->
                         <el-image
-                            :src="row.photo ? row.photo : 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'"
-                            :zoom-rate="1.2" :max-scale="7" :min-scale="0.2" style="width: 50px; height: 50px;"
-                            fit="cover" />
+                        :src="scope.row.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'"
+                        fit="cover"
+                        :zoom-rate="1.2"
+                        :max-scale="7"
+                        :min-scale="0.2"
+                        style="width: 50px; height: 50px; border-radius: 0;"
+                        />
                     </template>
                 </el-table-column>
                 <el-table-column prop="gender" label="性别" />
