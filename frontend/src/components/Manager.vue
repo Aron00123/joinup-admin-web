@@ -3,7 +3,7 @@
     <!-- 头部 -->
     <div class="manager-header">
       <div class="manager-header-left">
-        <img src="../assets/imgs/Join Up!-logo.png">
+        <img src="../assets/imgs/join-up-logo.png">
         <div class="title">Join Up!后台管理系统</div>
       </div>
 
@@ -67,7 +67,7 @@
             <el-menu-item index="/user">用户管理</el-menu-item>
           </el-sub-menu>
 
-          <el-sub-menu index="reserve" v-if="user.role === 'ADMIN'">
+          <el-sub-menu index="content" v-if="user.role === 'ADMIN'">
             <template #title>
               <el-icon>
                 <Histogram/>

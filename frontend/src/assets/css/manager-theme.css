@@ -1,0 +1,13 @@
+:root {
+    /* 主色换成青绿色 */
+    --el-color-primary: #20c997;
+    --el-color-primary-light-3: #e6fffa;
+    --el-color-primary-dark-2: #198754;
+  
+    /* 次要色彩也跟着微调 */
+    --el-color-info: #17a2b8;
+    --el-color-success: #20c997;
+    --el-color-warning: #ffc107;
+    --el-color-danger:  #dc3545;
+  }
+  
