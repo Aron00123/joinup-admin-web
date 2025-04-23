@@ -58,9 +58,9 @@ const router = useRouter();
 // 登录认证信息
 const loginCredentials = {
   // 登录用户名，这里从环境变量获取，也可以写死（但是不建议）
-  username: 'kg',
+  username: "kg",
   // 登录密码，这里从环境变量获取，也可以写死（但是不建议）
-  password: 'rcx123456'
+  password: "rcx123456",
 };
 
 // 登录方法
@@ -77,8 +77,8 @@ const onLogin = () => {
                 "Content-Type": "application/json"
             },
             data: {
-                username: loginCredentials.username,
-                password: loginCredentials.password
+                username: form.id,
+                password: form.password
             }
         })
         .then(response => {
