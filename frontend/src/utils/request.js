@@ -3,8 +3,9 @@ import { useRouter } from 'vue-router';
 
 // 创建 axios 实例
 const request = axios.create({
-    // baseURL: import.meta.env.VITE_APP_BASEURL
+    // baseURL: "https://joinup.org.cn/api", // API base URL
     baseURL: "http://localhost:8088",
+    // baseURL: "http://123.56.43.103/api",
     headers: {
         'Content-Type': 'application/json',
     },

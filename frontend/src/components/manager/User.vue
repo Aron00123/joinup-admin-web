@@ -57,22 +57,22 @@
 
             <el-form :model="form" label-width="120px" style="padding-right: 30px" :rules="rules" ref="formRef">
                 <el-form-item label="用户名" prop="username">
-                    <el-input v-model="form.username" placeholder="用户名"></el-input>
+                    <el-input v-model="form.username" placeholder="用户名" disabled></el-input>
                 </el-form-item>
-                <el-form-item label="密码" prop="password">
-                    <el-input v-model="form.password" placeholder="密码"></el-input>
+                <el-form-item label="密码" prop="password" disabled >
+                    <el-input v-model="form.password" placeholder="密码" disabled></el-input>
                 </el-form-item>
-                <el-form-item label="性别" prop="gender">
-                    <el-input v-model="form.gender" placeholder="性别"></el-input>
+                <el-form-item label="性别" prop="gender" disabled>
+                    <el-input v-model="form.gender" placeholder="性别" disabled></el-input>
                 </el-form-item>
                 <el-form-item label="邮箱" prop="email">
-                    <el-input v-model="form.email" placeholder="邮箱"></el-input>
+                    <el-input v-model="form.email" placeholder="邮箱" disabled></el-input>
                 </el-form-item>
                 <el-form-item label="认证" prop="verified">
                     <el-input v-model="form.verified" placeholder="认证"></el-input>
                 </el-form-item>
                 <el-form-item label="学号" prop="studentId">
-                    <el-input v-model="form.studentId" placeholder="学号"></el-input>
+                    <el-input v-model="form.studentId" placeholder="学号" disabled></el-input>
                 </el-form-item>
 
             </el-form>
