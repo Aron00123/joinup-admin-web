@@ -14,6 +14,7 @@ import Team from '../components/manager/Team.vue';
 import Application from '../components/manager/Application.vue';
 import Announcement from '../components/manager/Announcement.vue';
 import TeamMember  from '../components/manager/TeamMember.vue';
+import Feedback from '../components/manager/Feedback.vue';
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -89,6 +90,12 @@ const router = createRouter({
                     name: 'TeamMember',
                     meta: {name: '成员管理'},
                     component: TeamMember,
+                },
+                {
+                    path: 'feedback',
+                    name: 'Feedback',
+                    meta: {name: '反馈管理'},
+                    component: Feedback,
                 }
             ],
         },
