@@ -15,6 +15,7 @@ import Application from '../components/manager/Application.vue';
 import Announcement from '../components/manager/Announcement.vue';
 import TeamMember  from '../components/manager/TeamMember.vue';
 import Feedback from '../components/manager/Feedback.vue';
+import Log from '../components/manager/Log.vue';
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -96,6 +97,12 @@ const router = createRouter({
                     name: 'Feedback',
                     meta: {name: '反馈管理'},
                     component: Feedback,
+                },
+                {
+                    path: 'log',
+                    name: 'Log',
+                    meta: {name: '接口调用'},
+                    component: Log,
                 }
             ],
         },
