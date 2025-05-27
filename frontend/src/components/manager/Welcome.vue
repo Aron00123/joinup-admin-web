@@ -23,7 +23,7 @@
                     接口数据
                 </div>
                 <div>
-                    <el-scrollbar height="480px">
+                    <el-scrollbar height="400px">
                         <el-timeline style="max-width:600px">
                             <el-timeline-item v-for="item in currentStats" :key="statType + '-' + itemKey(item)"
                                 placement="top">
