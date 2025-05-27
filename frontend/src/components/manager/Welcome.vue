@@ -1,16 +1,12 @@
 <template>
     <div>
+        <!-- 新增：自动加载开关，放在最顶部或你希望的位置 -->
+        <div style="margin-bottom:16px">
+            <el-switch v-model="autoFetch" active-text="自动加载接口数据" inactive-text="手动加载接口数据" @change="onAutoFetchChange" />
+        </div>
         <div class="search">
-            <el-date-picker
-                v-model="dateRange"            
-                type="daterange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                format="YYYY-MM-DD"
-                value-format="YYYY-MM-DD"     
-                :size="'default'"
-            />
+            <el-date-picker v-model="dateRange" type="daterange" range-separator="至" start-placeholder="开始日期"
+                end-placeholder="结束日期" format="YYYY-MM-DD" value-format="YYYY-MM-DD" :size="'default'" />
 
             <el-button type="info" plain style="margin-left: 10px" @click="onSearch">查询</el-button>
             <el-button type="warning" plain style="margin-left: 10px" @click="reset">重置</el-button>
@@ -55,24 +51,41 @@
 
 <script setup lang="ts">
 import { ElMessage } from "element-plus";
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, watch, computed } from "vue";
 import request from "../../utils/request"; // 引入封装的 axios 实例
+
+// const autoFetch = ref(false);
+
+const autoFetch = ref(
+  localStorage.getItem('autoFetch') === 'true'
+);
+
+watch(autoFetch, val => {
+  localStorage.setItem('autoFetch', val.toString());
+});
 
 /* 日期区间；默认 null 表示未选 */
 const dateRange = ref<[string, string] | null>(null)
 
 /* 查询按钮：带日期调用 */
 const onSearch = () => {
-  const [start, end] = dateRange.value || []
-  loadPathStats(start, end)
-  loadUserStats(start, end)          // 先全拉，切维度时无需再请求
+    const [start, end] = dateRange.value || []
+    loadPathStats(start, end)
+    loadUserStats(start, end)          // 先全拉，切维度时无需再请求
 }
 
 /* 重置按钮 */
 const reset = () => {
-  dateRange.value = null
-  loadPathStats()
-  loadUserStats()
+    dateRange.value = null
+    loadPathStats()
+    loadUserStats()
+    if (autoFetch.value) {
+        loadPathStats()
+        loadUserStats()
+    } else {
+        pathStats.value = []
+        userStats.value = []
+    }
 }
 
 // 初始化用户信息和公告列表
@@ -122,11 +135,34 @@ const loadUserStats = (start?: string, end?: string) => {
         }).catch(() => ElMessage.error('获取 User 统计失败'))
 }
 
-// 在组件挂载时调用公告数据获取方法
+// 新增：开关切换时触发
+function onAutoFetchChange(val: boolean) {
+    if (val) {
+        // 打开自动加载，立即拉一次
+        loadPathStats()
+        loadUserStats()
+    } else {
+        // 关闭自动加载，清空当前数据
+        pathStats.value = []
+        userStats.value = []
+    }
+}
+
+// // 在组件挂载时调用公告数据获取方法
+// onMounted(() => {
+//     loadPathStats();
+//     loadUserStats();
+// });
+
+
+// 如果你还想在 onMounted 里根据 autoFetch 决定是否拉：
 onMounted(() => {
-    loadPathStats();
-    loadUserStats();
-});
+    if (autoFetch.value) {
+        loadPathStats();
+        loadUserStats();
+    }
+})
+
 </script>
 
 <style scoped>

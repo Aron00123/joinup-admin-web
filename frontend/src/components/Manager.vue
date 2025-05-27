@@ -67,6 +67,16 @@
             <el-menu-item index="/user">用户管理</el-menu-item>
           </el-sub-menu>
 
+          <el-sub-menu index="chatLog" v-if="user.role === 'ADMIN'">
+            <template #title>
+              <el-icon>
+                <UserFilled/>
+              </el-icon>
+              <i class="el-icon-menu"></i><span><strong>聊天记录管理</strong></span>
+            </template>
+            <el-menu-item index="/chatLog">聊天记录管理</el-menu-item>
+          </el-sub-menu>
+
           <el-sub-menu index="content" v-if="user.role === 'ADMIN'">
             <template #title>
               <el-icon>
