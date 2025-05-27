@@ -41,6 +41,7 @@ import {reactive, ref} from "vue";
 import {useRouter} from "vue-router";
 import {ElMessage} from "element-plus";
 import request from "../utils/request";
+import {scheduleTokenRefresh} from "../utils/tokenRefresher";
 
 const form = reactive({
   id: "",
@@ -95,6 +96,9 @@ const onLogin = () => {
                 user.role = "ADMIN";
                 localStorage.setItem("xm-user", JSON.stringify(user));
                 const user1 = JSON.parse(localStorage.getItem("xm-user") || "{}");
+
+                scheduleTokenRefresh(19);
+
                 // 跳转主页
                 router.push("/");
                 ElMessage.success("登录成功");
