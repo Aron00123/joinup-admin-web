@@ -6,6 +6,7 @@
                 clearable class="inline-input w-50" style="width: 200px" placeholder="请输入会话编号查询" />
             <el-button type="info" plain style="margin-left: 10px" @click="search(1)">查询</el-button>
             <el-button type="warning" plain style="margin-left: 10px" @click="reset">重置</el-button>
+            <el-button type="success" plain style="margin-left:10px" @click="exportToExcel">导出为XLSX</el-button>
         </div>
 
         <!-- 操作区域 -->
@@ -67,6 +68,8 @@
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import request from "../../utils/request"; // 替换为实际的请求工具
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 // 数据定义
 const tableData = ref([]);
@@ -298,6 +301,61 @@ const reset = () => {
     chatMessageName.value = "";
     load(1);
 };
+
+async function exportToExcel() {
+  try {
+    // 拿到匹配总数
+    const countRes = await request.get('/admin/message/chat/searchCount', {
+      params: { name: chatMessageName.value }
+    });
+    const totalCount = Number(countRes.data) || 0;
+    if (totalCount === 0) {
+      ElMessage.warning('当前无可导出数据');
+      return;
+    }
+
+    // 一次性拉取“所有”数据（page=1, size=totalCount）
+    const listRes = await request.get('/admin/message/chat/search', {
+      params: {
+        name: chatMessageName.value,
+        page: 1,
+        size: totalCount
+      }
+    });
+    const rows = listRes.records || [];
+
+    // 构造表头和数据行
+    const header = ['序号', '会话编号', '内容', '创建时间'];
+    const data = rows.map((row, idx) => {
+      // content 是对象：把 key:value 拼成一段字符串
+      const contentStr = Object.entries(row.content)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join('\n');
+      return [
+        idx + 1,
+        row.conversationId,
+        contentStr,
+        row.createTime
+      ];
+    });
+
+    // 用 SheetJS 生成工作表、工作簿
+    const ws = XLSX.utils.aoa_to_sheet([header, ...data]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '聊天记录');
+
+    // 写入并触发下载
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    saveAs(
+      new Blob([wbout], { type: 'application/octet-stream' }),
+      `聊天记录_${new Date().toISOString().slice(0,10)}.xlsx`
+    );
+  } catch (err) {
+    console.error(err);
+    ElMessage.error('导出失败，请稍后重试');
+  }
+}
+
 
 onMounted(() => {
     // load(1);
