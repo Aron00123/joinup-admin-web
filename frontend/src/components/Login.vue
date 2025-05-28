@@ -73,7 +73,7 @@ const onLogin = () => {
       // 发起登录请求
         request({
             url: "http://localhost:8088/user/login",
-            // url: "https://joinup.org.cn/api/user/login",
+            // url: "https://joinup.org.cn/api-dev/user/login",
             // url: "http://123.56.43.103/api/user/login",
             method: "POST",
             headers: {
@@ -100,7 +100,7 @@ const onLogin = () => {
                 scheduleTokenRefresh(19);
 
                 // 跳转主页
-                router.push("/");
+                router.push("/welcome");
                 ElMessage.success("登录成功");
             } else {
               ElMessage.error(response.msg || "登录失败");

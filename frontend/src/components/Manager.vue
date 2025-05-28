@@ -65,6 +65,7 @@
               <i class="el-icon-menu"></i><span><strong>用户信息管理</strong></span>
             </template>
             <el-menu-item index="/user">用户管理</el-menu-item>
+            <el-menu-item index="/onlinePerson">在线用户</el-menu-item>
           </el-sub-menu>
 
           <el-sub-menu index="chatLog" v-if="user.role === 'ADMIN'">
