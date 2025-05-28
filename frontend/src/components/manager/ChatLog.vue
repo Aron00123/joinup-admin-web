@@ -325,16 +325,18 @@ async function exportToExcel() {
     const rows = listRes.records || [];
 
     // 构造表头和数据行
-    const header = ['序号', '会话编号', '内容', '创建时间'];
+    const header = ['序号', '会话编号', '内容', '类型', '发送者编号', '创建时间'];
     const data = rows.map((row, idx) => {
       // content 是对象：把 key:value 拼成一段字符串
       const contentStr = Object.entries(row.content)
-        .map(([k, v]) => `${k}: ${v}`)
+        .map(([k, v]) => `${v}`)
         .join('\n');
       return [
         idx + 1,
         row.conversationId,
         contentStr,
+        row.type,
+        row.senderId,
         row.createTime
       ];
     });
