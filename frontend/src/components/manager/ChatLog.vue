@@ -341,6 +341,8 @@ async function exportToExcel() {
       ];
     });
 
+    const singleId = rows[0]?.conversationId || '';
+
     // 用 SheetJS 生成工作表、工作簿
     const ws = XLSX.utils.aoa_to_sheet([header, ...data]);
     const wb = XLSX.utils.book_new();
@@ -350,7 +352,7 @@ async function exportToExcel() {
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     saveAs(
       new Blob([wbout], { type: 'application/octet-stream' }),
-      `聊天记录_${new Date().toISOString().slice(0,10)}.xlsx`
+      `聊天记录_${singleId}_${new Date().toISOString().slice(0,10)}.xlsx`
     );
   } catch (err) {
     console.error(err);
