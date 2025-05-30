@@ -3,7 +3,7 @@ import { useRouter } from 'vue-router';
 
 // 创建 axios 实例
 const request = axios.create({
-    // baseURL: "https://joinup.org.cn/api", // API base URL
+    // baseURL: "https://joinup.org.cn/api-dev", // API base URL
     baseURL: "http://localhost:8088",
     // baseURL: "http://123.56.43.103/api",
     headers: {

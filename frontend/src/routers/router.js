@@ -17,6 +17,7 @@ import TeamMember  from '../components/manager/TeamMember.vue';
 import Feedback from '../components/manager/Feedback.vue';
 import Log from '../components/manager/Log.vue';
 import ChatLog from '../components/manager/ChatLog.vue';
+import OnlinePerson from '../components/manager/OnlinePerson.vue';
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -25,7 +26,7 @@ const router = createRouter({
             path: '/',
             name: 'Manager',
             component: Manager,
-            redirect: 'welcome',
+            redirect: 'login',
             children: [
                 {
                     path: 'welcome',
@@ -110,6 +111,12 @@ const router = createRouter({
                     name: 'ChatLog',
                     meta: {name: '聊天记录'},
                     component: ChatLog,
+                },
+                                {
+                    path: 'onlinePerson',
+                    name: 'OnlinePerson',
+                    meta: {name: '在线用户'},
+                    component: OnlinePerson,
                 },
             ],
         },
