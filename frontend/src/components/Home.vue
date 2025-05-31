@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 站点头部 -->
-    <header>
+    <header class="fixed-header">
       <h1>JOINUP</h1>
       <!-- 顶部右侧登录按钮 -->
       <router-link to="/login" class="login-btn header-login">进入后台系统</router-link>
@@ -65,7 +65,7 @@
     </main>
 
     <!-- 页脚 -->
-    <footer>
+    <footer class="fixed-footer">
       &copy; 2025 我的前端页面. 保留所有权利。
     </footer>
   </div>
@@ -90,13 +90,30 @@ body {
 
 /***************  头部  ***************/
 header {
-  background-color: #3dc2e7;
+  background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%);;
   color: #333;
   padding: 1rem 2rem; /* 右边留点内边距 */
   text-align: center;
   position: relative; /* 用于绝对定位按钮 */
 }
 header h1 {
+  font-family: 'Pacifico', cursive;
+  font-size: 3.5rem;
+  background: linear-gradient(45deg, #12c2e9, #c471ed, #f64f59);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+  margin: 0;
+}
+
+header.fixed-header {
+  background: #3dc2e7;
+  color: #333;
+  padding: 1rem 2rem; /* 右边留点内边距 */
+  text-align: center;
+  position: relative; /* 用于绝对定位按钮 */
+}
+header.fixed-header h1 {
   font-family: 'Pacifico', cursive;
   font-size: 3.5rem;
   background: linear-gradient(45deg, #12c2e9, #c471ed, #f64f59);
@@ -218,7 +235,7 @@ main {
 /***************  登录按钮  ***************/
 .login-btn {
   display: inline-block;
-  background: #007bff;
+  background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%);;
   color: #fff;
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -229,8 +246,8 @@ main {
   white-space: nowrap;
 }
 .login-btn:hover {
-  background: #0056b3;
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, #8ea1f4 100%, #70deac 0%,);;
+  transform: translateY(-15px);
 }
 /* 头部右侧按钮位置 */
 .header-login {
@@ -241,12 +258,26 @@ main {
 }
 
 /***************  页脚  ***************/
-footer {
+
+
+
+footer.fixed-footer {
   background-color: #333;
   color: white;
   text-align: center;
   padding: 1rem;
   position: fixed;
+  bottom: 0;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+footer {
+
+  color: white;
+  text-align: center;
+
+  padding: 1rem;
   bottom: 0;
   width: 100%;
   font-size: 0.9rem;

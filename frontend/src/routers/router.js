@@ -4,9 +4,6 @@ import Login from "../components/Login.vue";
 import Manager from "../components/Manager.vue";
 import NotFound from "../components/404.vue";
 import User from "../components/manager/User.vue";
-import AdminPerson from "../components/manager/AdminPerson.vue";
-import Password from "../components/manager/Password.vue";
-import Notice from "../components/manager/Notice.vue";
 import Welcome from "../components/manager/Welcome.vue";
 import Theme from "../components/manager/Theme.vue";
 import Tag from "../components/manager/Tag.vue";
@@ -15,7 +12,6 @@ import Application from "../components/manager/Application.vue";
 import Announcement from "../components/manager/Announcement.vue";
 import TeamMember from "../components/manager/TeamMember.vue";
 import Feedback from "../components/manager/Feedback.vue";
-import Log from "../components/manager/Log.vue";
 import ChatLog from "../components/manager/ChatLog.vue";
 import OnlinePerson from "../components/manager/OnlinePerson.vue";
 import Home from "../components/Home.vue";
@@ -40,24 +36,6 @@ const router = createRouter({
                     name: "User",
                     meta: { name: "用户信息" },
                     component: User,
-                },
-                {
-                    path: "adminPerson",
-                    name: "AdminPerson",
-                    meta: { name: "个人信息" },
-                    component: AdminPerson,
-                },
-                {
-                    path: "password",
-                    name: "Password",
-                    meta: { name: "修改密码" },
-                    component: Password,
-                },
-                {
-                    path: "notice",
-                    name: "Notice",
-                    meta: { name: "公告信息" },
-                    component: Notice,
                 },
                 {
                     path: "theme",
@@ -100,12 +78,6 @@ const router = createRouter({
                     name: "Feedback",
                     meta: { name: "反馈管理" },
                     component: Feedback,
-                },
-                {
-                    path: "log",
-                    name: "Log",
-                    meta: { name: "接口调用" },
-                    component: Log,
                 },
                 {
                     path: "chatLog",
