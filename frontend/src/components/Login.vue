@@ -126,7 +126,7 @@ const onLogin = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: url("https://s2.loli.net/2024/07/05/aR7VSyNw5vjhUkC.jpg") no-repeat center;
+  background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%) no-repeat center;
   background-size: cover;
 }
 
@@ -154,7 +154,7 @@ const onLogin = () => {
 }
 
 .signin-btn {
-  background-color: #4284db;
+  background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%);;
   color: white;
   width: 100%;
 }
