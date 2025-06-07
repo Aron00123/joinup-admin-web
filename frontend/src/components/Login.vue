@@ -59,7 +59,7 @@ const router = useRouter();
 // 登录认证信息
 const loginCredentials = {
   // 登录用户名，这里从环境变量获取，也可以写死（但是不建议）
-  username: "kg",
+  username: "管理员",
   // 登录密码，这里从环境变量获取，也可以写死（但是不建议）
   password: "rcx123456",
 };
@@ -72,10 +72,9 @@ const onLogin = () => {
 
       // 发起登录请求
         request({
-            url: "http://localhost:8088/user/login",
+            // url: "http://localhost:8088/user/login",
             // url: "https://joinup.org.cn/api-dev/user/login",
-            // url: "http://123.56.43.103/api/user/login",
-            // url: "https://joinup.org.cn/api/user/login",
+            url: "https://joinup.org.cn/api/user/login",
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -98,7 +97,8 @@ const onLogin = () => {
                 localStorage.setItem("xm-user", JSON.stringify(user));
                 const user1 = JSON.parse(localStorage.getItem("xm-user") || "{}");
 
-                scheduleTokenRefresh(19);
+                scheduleTokenRefresh(5);
+                console.log("tokenRefresher started");
 
                 // 跳转主页
                 router.push("/welcome");
