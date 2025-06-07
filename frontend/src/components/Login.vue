@@ -74,7 +74,6 @@ const onLogin = () => {
         request({
             // url: "http://localhost:8088/user/login",
             // url: "https://joinup.org.cn/api-dev/user/login",
-            // url: "http://123.56.43.103/api/user/login",
             url: "https://joinup.org.cn/api/user/login",
             method: "POST",
             headers: {
@@ -98,7 +97,8 @@ const onLogin = () => {
                 localStorage.setItem("xm-user", JSON.stringify(user));
                 const user1 = JSON.parse(localStorage.getItem("xm-user") || "{}");
 
-                scheduleTokenRefresh(19);
+                scheduleTokenRefresh(5);
+                console.log("tokenRefresher started");
 
                 // 跳转主页
                 router.push("/welcome");

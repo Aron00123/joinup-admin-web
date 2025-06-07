@@ -1,58 +1,54 @@
 <template>
     <div class="chat-management">
-        <!-- 搜索区域 -->
-        <div class="search-section">
-            <div class="search-group">
-                <el-autocomplete v-model="chatMessageName" :fetch-suggestions="querySearch" :trigger-on-focus="false"
-                    clearable class="search-input" placeholder="请输入会话编号查询" @keyup.enter="search(1)">
-                    <template #prefix>
-                        <i class="el-icon-chat-dot-square"></i>
-                    </template>
-                </el-autocomplete>
-                <el-button type="primary" @click="search(1)" class="search-btn">查询</el-button>
+        <!-- 操作区域：仅保留“导出”按钮 -->
+
+        <!-- 顶部工具栏 -->
+        <div class="toolbar">
+            <div class="conversation-title">
+                会话 <strong>{{ conversationId }}</strong> 的聊天记录
             </div>
 
-            <div class="action-group">
+            <!-- <el-button type="success" plain @click="exportToExcel" class="export-btn">
+                <i class="el-icon-download"></i>
+                导出为XLSX
+            </el-button> -->
+            <div class="toolbar-actions">
                 <el-button type="success" plain @click="exportToExcel" class="export-btn">
                     <i class="el-icon-download"></i>
                     导出为XLSX
                 </el-button>
-                <el-button type="warning" plain @click="reset" class="reset-btn">
-                    <i class="el-icon-refresh"></i>
-                    重置
+
+                <el-button type="info" plain @click="goBack" class="back-btn">
+                    <i class="el-icon-arrow-left"></i>
+                    返回
                 </el-button>
             </div>
         </div>
 
-        <!-- 表格区域 -->
+
+        <!-- 表格区域（与原列表一致） -->
         <div class="table-section">
             <el-table :data="tableData" stripe @selection-change="handleSelectionChange" class="data-table"
                 v-loading="loading">
                 <el-table-column type="selection" width="55" align="center" />
-                <el-table-column prop="id" label="序号" width="70" sortable align="center" />
-                <!-- <el-table-column prop="conversationId" label="会话编号" width="360" align="center" show-overflow-tooltip>
+                <el-table-column prop="id" label="序号" width="140" sortable align="center" />
+
+                <!-- 会话编号：这里只是展示，不再跳链 -->
+                <!-- <el-table-column prop="conversationId" label="会话编号" width="360" align="center">
                     <template #default="scope">
-                        <div class="conversation-id">
-                            <el-tag type="info" size="small">
-                                {{ scope.row.conversationId }}
-                            </el-tag>
-                        </div>
-                    </template>
-                </el-table-column> -->
-                <el-table-column prop="conversationId" label="会话编号" width="360" align="center">
-                    <template #default="scope">
-                        <el-button type="primary" link @click="goToConversation(scope.row.conversationId)">
+                        <el-tag type="info" size="small">
                             {{ scope.row.conversationId }}
-                        </el-button>
+                        </el-tag>
                     </template>
-                </el-table-column>
+</el-table-column> -->
+
+                <!-- 聊天内容、发送者、时间，与原列表完全一致 ↓ -->
                 <el-table-column label="聊天内容" show-overflow-tooltip>
                     <template #default="{ row }">
                         <div class="chat-content">
-                            <!-- 图片消息 -->
                             <div v-if="row.type === 'IMAGE'" class="image-message">
                                 <div class="image-info">
-                                    <span class="image-label">image:</span>
+                                    <span class="image-label">图片消息:</span>
                                     <span class="image-name">{{ row.content.name }}</span>
                                 </div>
                                 <div class="image-container">
@@ -61,7 +57,6 @@
                                         :preview-src-list="[row.content.url]" preview-teleported />
                                 </div>
                             </div>
-                            <!-- 普通文本消息 -->
                             <div v-else>
                                 <div v-for="(val, key) in row.content" :key="key" class="message-item">
                                     <span class="message-label">{{ key }}:</span>
@@ -71,7 +66,8 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="username" label="发送者" width="160" align="center">
+
+                <el-table-column prop="username" label="发送者" width="240" align="center">
                     <template #default="scope">
                         <div class="sender-info">
                             <i class="el-icon-user"></i>
@@ -79,6 +75,7 @@
                         </div>
                     </template>
                 </el-table-column>
+
                 <el-table-column prop="createTime" label="发送时间" width="120" align="center">
                     <template #default="scope">
                         <div class="time-info">
@@ -96,110 +93,174 @@
                     :total="total" />
             </div>
         </div>
-
     </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
-import request from "../../utils/request";
+import { ref, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { ElMessage } from 'element-plus';
+import request from '../../utils/request';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { useRouter } from 'vue-router';
-const router = useRouter();
 
-// 在同一 <script setup> 内新增方法
-const goToConversation = (conversationId) => {
-    if (!conversationId) return;
-    router.push({ name: 'ConversationDetail', params: { id: conversationId } });
-};
-
-// 数据定义
+/* ---------------- 基本状态 ---------------- */
+const router      = useRouter();
+const route = useRoute();
+const conversationId = route.params.id;      // 路由 :id
 const tableData = ref([]);
 const pageNum = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
 const loading = ref(false);
-const saveLoading = ref(false);
-
-// 查询条件
-const chatMessageName = ref("");
-
 const ids = ref([]);
 
-// 1. 添加用户信息缓存
-const userCache = ref(new Map()); // 缓存用户信息，避免重复请求
+const goBack = () => {
+  /* 若路由里给聊天管理页起了 name：'ChatManagement'，优先用 push，
+     否则直接 router.back() 也能返回上一页 */
+  router.push({ name: 'ChatLog' }).catch(() => {});
+  // router.back();
+};
 
-// 2. 根据用户ID获取用户名的函数
+/* ----------- 用户名缓存（沿用原实现） -------- */
+const userCache = ref(new Map());
+
 const getUsernameById = async (senderId) => {
     if (!senderId) return '未知用户';
-
-    // 先检查缓存
-    if (userCache.value.has(senderId)) {
-        return userCache.value.get(senderId);
-    }
+    if (userCache.value.has(senderId)) return userCache.value.get(senderId);
 
     try {
-        const res = await request.get("/admin/user/searchStudentId", {
-            params: {
-                studentId: senderId,
-                page: 1,
-                size: 1,
-            }
+        const res = await request.get('/admin/user/searchStudentId', {
+            params: { studentId: senderId, page: 1, size: 1 },
         });
-
         const username = res.records?.[0]?.username || '未知用户';
-        // 缓存结果
         userCache.value.set(senderId, username);
         return username;
-    } catch (error) {
-        console.error('获取用户名失败:', error);
+    } catch {
         return '获取失败';
     }
 };
 
-// 3. 批量处理用户名转换
 const processUsernames = async (data) => {
-    // 获取所有唯一的senderId
-    const senderIds = [...new Set(data.map(item => item.senderId).filter(Boolean))];
-
-    // 批量获取用户名
-    await Promise.all(
-        senderIds.map(async (senderId) => {
-            if (!userCache.value.has(senderId)) {
-                await getUsernameById(senderId);
-            }
-        })
-    );
-
-    // 为每条记录添加username字段
+    if (data.every(i => i.username && i.username !== '未知用户')) return data;
+    const senderIds = [...new Set(data.map(i => i.senderId).filter(Boolean))];
+    await Promise.all(senderIds.map(id => getUsernameById(id)));
     return data.map(item => ({
         ...item,
-        username: userCache.value.get(item.senderId) || '未知用户'
+        username: userCache.value.get(item.senderId) || '未知用户',
     }));
 };
 
-// 工具函数
-const getMessageTypeColor = (type) => {
-    const colors = {
-        'TEXT': 'primary',
-        'IMAGE': 'success',
-        'FILE': 'warning',
-        'SYSTEM': 'info'
+/* ----------------- 工具函数 ----------------- */
+const formatTime = (t) => (t ? new Date(t).toLocaleString('zh-CN') : '');
+
+const previewImage = (url) => console.log('预览图片', url);
+
+function adaptMessage(item) {
+    return {
+        id: item.id,
+        // ➜ 会话 ID
+        conversationId: item.conversation?.id ?? '',
+        // ➜ 发送者
+        senderId: item.sender?.id ?? '',
+        username: item.sender?.username ?? '未知用户',
+        avatar: item.sender?.avatar ?? '',
+        // ➜ 核心消息字段（后端名称若不同请对照修改）
+        type: item.type,
+        content: item.content,
+        createTime: item.createTime,
     };
-    return colors[type] || 'info';
+}
+
+/* ----------------- 数据加载 ----------------- */
+
+const load = async (page = 1) => {
+    pageNum.value = page;
+    loading.value = true;
+
+    try {
+        const res = await request.post(
+            `/admin/message/chat/${conversationId}/filter`,
+            { pageNumber: pageNum.value, pageSize: pageSize.value }            // 你的 DTO 字段名若不同，请同步调整
+        );
+
+        /* === 新接口格式 ============================= */
+        const rawData = res?.data?.list ?? [];
+        const tot = res?.data?.total ?? 0;
+        /* ============================================ */
+
+        total.value = Number(tot);
+        // 统一字段后再做用户名缓存处理（若你仍想请求后端补全，可保留）
+        tableData.value = await processUsernames(rawData.map(adaptMessage));
+
+    } catch (e) {
+        ElMessage.error('数据加载失败');
+    } finally {
+        loading.value = false;
+    }
 };
 
-const getMessageTypeIcon = (type) => {
-    const icons = {
-        'TEXT': 'el-icon-chat-dot-round',
-        'IMAGE': 'el-icon-picture',
-        'FILE': 'el-icon-document',
-        'SYSTEM': 'el-icon-setting'
-    };
-    return icons[type] || 'el-icon-chat-dot-round';
+
+const handleCurrentChange = (p) => load(p);
+const handleSelectionChange = (rows) => {
+    ids.value = rows.map(r => r.id);
 };
+
+/* ------------------ 导出 ------------------- */
+// async function exportToExcel() {
+//     try {
+//         ElMessage.info('正在导出，请稍候...');
+//         const res = await request.post(
+//             `/admin/message/chat/${conversationId}/filter`,
+//             { page: 1, size: 10000 }
+//         );
+
+//         const list = (res?.data?.list ?? []).map(adaptMessage);
+
+//         const header = ['序号', '会话编号', '聊天内容', '消息类型', '发送者编号', '发送时间'];
+//         const body = [];
+//         const imgMap = [];
+
+//         records.forEach((row, idx) => {
+//             const content = row.type === 'IMAGE'
+//                 ? ''
+//                 : Object.values(row.content).join('\n');
+
+//             body.push([
+//                 idx + 1,
+//                 row.conversationId,
+//                 content,
+//                 row.type,
+//                 row.senderId,
+//                 formatTime(row.createTime)
+//             ]);
+
+//             if (row.type === 'IMAGE' && row.content?.url) {
+//                 imgMap.push({ rowIdx: idx + 1, url: row.content.url });
+//             }
+//         });
+
+//         const ws = XLSX.utils.aoa_to_sheet([header, ...body]);
+//         const wb = XLSX.utils.book_new();
+//         XLSX.utils.book_append_sheet(wb, ws, '会话记录');
+
+//         ws['!rows'] = [];
+//         await Promise.all(imgMap.map(async ({ rowIdx, url }) => {
+//             const buf = await fetch(url, { mode: 'cors' }).then(r => r.arrayBuffer());
+//             const mime = url.endsWith('.png') ? 'image/png' : 'image/jpeg';
+//             const imgId = XLSX.utils.book_new_image(wb, buf, mime);
+//             XLSX.utils.sheet_add_image(ws, imgId, { tl: { col: 2, row: rowIdx }, ext: { width: 120, height: 120 } });
+//             ws['!rows'][rowIdx] = { hpt: 90 };
+//         }));
+
+//         const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+//         saveAs(new Blob([out], { type: 'application/octet-stream' }),
+//             `会话_${conversationId}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+//         ElMessage.success('导出成功');
+//     } catch (e) {
+//         ElMessage.error('导出失败');
+//     }
+// }
 
 const getMessageTypeText = (type) => {
     const texts = {
@@ -211,125 +272,13 @@ const getMessageTypeText = (type) => {
     return texts[type] || type || '未知';
 };
 
-const formatTime = (time) => {
-    if (!time) return '';
-    return new Date(time).toLocaleString('zh-CN');
-};
-
-// 图片预览
-const previewImage = (url, name) => {
-    // el-image 组件已经内置了预览功能，这里可以添加额外的处理逻辑
-    console.log('预览图片:', { url, name });
-};
-
-const load = async (page = 1) => {
-    pageNum.value = page;
-    loading.value = true;
-
-    try {
-        const [countRes, listRes] = await Promise.all([
-            request.get("/admin/message/chat/count"),
-            request.get("/admin/message/chat/list", {
-                params: {
-                    page: pageNum.value,
-                    size: pageSize.value,
-                }
-            })
-        ]);
-
-        total.value = Number(countRes.data) || 0;
-        const rawData = listRes.records || [];
-
-        // 处理用户名转换
-        tableData.value = await processUsernames(rawData);
-
-    } catch (error) {
-        ElMessage.error("请求失败，请稍后重试");
-    } finally {
-        loading.value = false;
-    }
-};
-
-// 分页切换
-const handleCurrentChange = (page) => {
-    if (chatMessageName.value && chatMessageName.value !== "") {
-        search(page);
-    } else {
-        load(page);
-    }
-};
-
-// 批量删除
-const handleSelectionChange = (rows) => {
-    ids.value = rows.map((row) => row.id);
-};
-
-// 自动补全查询
-const querySearch = (queryString, cb) => {
-    let results = [];
-    request.get("/admin/message/chat/querySearch", {
-        params: { name: queryString }
-    }).then((res) => {
-        if (res.code === 1) {
-            results = res.data;
-            results.forEach(item => {
-                item.value = item.conversationId;
-            });
-            cb(results);
-        } else {
-            ElMessage.error(res.msg);
-        }
-    }).catch(() => {
-        ElMessage.error("请求失败，请稍后重试");
-    });
-};
-
-const search = async (page) => {
-    if (page) pageNum.value = page;
-    loading.value = true;
-
-    try {
-        const [countRes, listRes] = await Promise.all([
-            request.get("/admin/message/chat/searchCount", {
-                params: { name: chatMessageName.value }
-            }),
-            request.get("/admin/message/chat/search", {
-                params: {
-                    name: chatMessageName.value,
-                    page: pageNum.value,
-                    size: pageSize.value,
-                }
-            })
-        ]);
-
-        total.value = Number(countRes.data) || 0;
-        const rawData = listRes.records || [];
-
-        // 处理用户名转换
-        tableData.value = await processUsernames(rawData);
-
-    } catch (error) {
-        ElMessage.error("请求失败，请稍后重试");
-    } finally {
-        loading.value = false;
-    }
-};
-
-// 重置查询条件
-const reset = () => {
-    chatMessageName.value = "";
-    load(1);
-};
-
-// 导出Excel
-// 导出 Excel（内嵌图片，纯 SheetJS）
 async function exportToExcel() {
     try {
         ElMessage.info('正在导出数据，请稍候...');
 
         /* 1. 拉取数据 ---------------------------------------------------- */
         const { data: count } = await request.get('/admin/message/chat/searchCount', {
-            params: { name: chatMessageName.value }
+            params: { name: conversationId }
         });
         const total = Number(count) || 0;
         if (total === 0) {
@@ -338,7 +287,7 @@ async function exportToExcel() {
         }
 
         const { records: rows = [] } = await request.get('/admin/message/chat/search', {
-            params: { name: chatMessageName.value, page: 1, size: total }
+            params: { name: conversationId, page: 1, size: total }
         });
 
         /* 2. 组装表格主体 ------------------------------------------------ */
@@ -415,10 +364,12 @@ async function exportToExcel() {
     }
 }
 
-onMounted(() => {
-    load(1);
-});
+/* ----------------- 初始化 ------------------ */
+onMounted(() => load(1));
 </script>
+
+<!-- 直接复用列表页样式，无需额外 CSS -->
+
 
 <style scoped>
 .chat-management {
@@ -457,11 +408,18 @@ onMounted(() => {
     width: 280px;
 }
 
+.back-btn,
 .search-btn,
 .reset-btn,
 .export-btn {
     border-radius: 8px;
     min-width: 80px;
+}
+
+.back-btn {
+    background: linear-gradient(135deg, #1a9ac4 0%, #2f9ce0 100%);
+    border-color: #1a9ac4;
+    color: white;
 }
 
 .export-btn {
@@ -470,6 +428,7 @@ onMounted(() => {
     color: white;
 }
 
+.back-btn,
 .export-btn:hover {
     opacity: 0.9;
     transform: translateY(-1px);
@@ -683,5 +642,28 @@ onMounted(() => {
 
 .chat-content::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;          /* 按钮间距 */
+}
+
+.conversation-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #303133;
 }
 </style>

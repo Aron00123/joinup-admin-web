@@ -259,54 +259,8 @@ const closeDialog = () => {
     isViewMode.value = false;
 };
 
-const del = (id) => {
-    ElMessageBox.confirm("您确定删除吗？", "确认删除", {
-        type: "warning",
-        confirmButtonText: "确认",
-        cancelButtonText: "取消"
-    }).then(() => {
-        request.post("/admin/theme/delete", { id })
-            .then((res) => {
-                if (res.code === 1) {
-                    ElMessage.success("操作成功");
-                    load(1);
-                } else {
-                    ElMessage.error(res.msg);
-                }
-            })
-            .catch(() => {
-                ElMessage.error("请求失败，请稍后重试");
-            });
-    });
-};
-
 const handleSelectionChange = (rows) => {
     ids.value = rows.map((row) => row.id);
-};
-
-const delBatch = () => {
-    if (!ids.value.length) {
-        ElMessage.warning("请选择数据");
-        return;
-    }
-    ElMessageBox.confirm("您确定批量删除这些数据吗？", "确认删除", {
-        type: "warning",
-        confirmButtonText: "确认",
-        cancelButtonText: "取消"
-    }).then(() => {
-        request.post("/admin/theme/delete/batch", { ids: ids.value })
-            .then((res) => {
-                if (res.code === 1) {
-                    ElMessage.success("操作成功");
-                    load(1);
-                } else {
-                    ElMessage.error(res.msg);
-                }
-            })
-            .catch(() => {
-                ElMessage.error("请求失败，请稍后重试");
-            });
-    });
 };
 
 const querySearchTheme = (queryString, cb) => {
