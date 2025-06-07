@@ -59,6 +59,12 @@
                                     <el-image :src="row.content.url" :alt="row.content.name" fit="cover"
                                         class="message-image" @click="previewImage(row.content.url, row.content.name)"
                                         :preview-src-list="[row.content.url]" preview-teleported />
+                                    <!-- 下载按钮：Tooltip + icon -->
+                                    <el-tooltip content="下载原图" placement="top">
+                                        <el-button circle size="small" type="primary" class="download-btn"
+                                            :icon="Download"
+                                            @click.stop="downloadImage(row.content.url, row.content.name)" />
+                                    </el-tooltip>
                                 </div>
                             </div>
                             <!-- 普通文本消息 -->
@@ -104,9 +110,14 @@
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import request from "../../utils/request";
-import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { useRouter } from 'vue-router';
+import ExcelJS from 'exceljs';
+import { Download } from '@element-plus/icons-vue';
+
+defineExpose({ Download });
+
+
 const router = useRouter();
 
 // 在同一 <script setup> 内新增方法
@@ -321,13 +332,12 @@ const reset = () => {
     load(1);
 };
 
-// 导出Excel
-// 导出 Excel（内嵌图片，纯 SheetJS）
+// 导出 Excel（ExcelJS 版，支持内嵌图片）
 async function exportToExcel() {
     try {
         ElMessage.info('正在导出数据，请稍候...');
 
-        /* 1. 拉取数据 ---------------------------------------------------- */
+        /* ——————————————————— 1. 拉取数据 ——————————————————— */
         const { data: count } = await request.get('/admin/message/chat/searchCount', {
             params: { name: chatMessageName.value }
         });
@@ -341,70 +351,87 @@ async function exportToExcel() {
             params: { name: chatMessageName.value, page: 1, size: total }
         });
 
-        /* 2. 组装表格主体 ------------------------------------------------ */
+        /* ——————————————————— 2. 创建工作簿 / 工作表 ——————————————————— */
+        const wb = new ExcelJS.Workbook();
+        wb.creator = 'JoinUp! 管理后台';
+        wb.created = new Date();
+
+        const ws = wb.addWorksheet('聊天记录', {
+            properties: { defaultRowHeight: 20 },
+            pageSetup: { paperSize: 9, orientation: 'landscape' }
+        });
+
+        /* ——————————————————— 3. 表头行 ——————————————————— */
         const header = ['序号', '会话编号', '聊天内容', '消息类型', '发送者编号', '发送时间'];
-        const body = [];
-        const imgMap = [];               // 记录 {rowIdx, url}
+        ws.addRow(header);
+        ws.getRow(1).font = { bold: true };
 
-        rows.forEach((row, idx) => {
-            // 文字或占位
-            const content = row.type === 'IMAGE'
-                ? ''                                    // 先留空，回头放图片
-                : Object.values(row.content).join('\n');
+        // 列宽（可按需调整）
+        ws.columns = [
+            { key: 'idx', width: 8 },
+            { key: 'cid', width: 45 },
+            { key: 'content', width: 60 },
+            { key: 'type', width: 12 },
+            { key: 'sid', width: 14 },
+            { key: 'time', width: 22 }
+        ];
 
-            body.push([
-                idx + 1,
-                row.conversationId,
-                content,
-                getMessageTypeText(row.type),
-                row.senderId,
-                formatTime(row.createTime)
-            ]);
+        /* ——————————————————— 4. 填充数据 & 记录需要插图的行 ——————————————————— */
+        const imgTasks = [];   // { rowNumber, url, ext }
 
-            // 收集图片任务
+        rows.forEach((row, i) => {
+            const rowNumber = i + 2;                     // ExcelJS 行号从 1 开始，+1 是表头
             if (row.type === 'IMAGE' && row.content?.url) {
-                imgMap.push({ rowIdx: idx + 1, url: row.content.url });  // +1 让位给表头
+                ws.addRow([
+                    i + 1,
+                    row.conversationId,
+                    '',                                      // “聊天内容”列留空，待会儿放图片
+                    getMessageTypeText(row.type),
+                    row.senderId,
+                    formatTime(row.createTime)
+                ]);
+                ws.getRow(rowNumber).height = 90;          // 调高行高给图片
+                imgTasks.push({
+                    rowNumber,
+                    url: row.content.url,
+                    ext: row.content.url.toLowerCase().endsWith('.png') ? 'png' : 'jpeg'
+                });
+            } else {
+                ws.addRow([
+                    i + 1,
+                    row.conversationId,
+                    Object.values(row.content).join('\n'),
+                    getMessageTypeText(row.type),
+                    row.senderId,
+                    formatTime(row.createTime)
+                ]);
             }
         });
 
-        /* 3. 创建工作簿 / 工作表 ----------------------------------------- */
-        const ws = XLSX.utils.aoa_to_sheet([header, ...body]);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, '聊天记录');
-
-        /* 4. 插图 -------------------------------------------------------- */
-        ws['!rows'] = ws['!rows'] || [];            // 方便调行高
-
-        // const buf1  = await fetch("https://survey-planet-test.oss-cn-beijing.aliyuncs.com/35d0dc4a-39dc-444e-9e53-7033757ad992.png", { mode: 'cors' }).then(r => r.arrayBuffer());
-
+        /* ——————————————————— 5. 下载并插入图片 ——————————————————— */
         await Promise.all(
-            imgMap.map(async ({ rowIdx, url }) => {
+            imgTasks.map(async ({ rowNumber, url, ext }) => {
                 try {
-                    // 抓图——需目标服务器允许 CORS；否则请自己代理
-
-                    const buf = await fetch(url, { mode: 'cors' }).then(r => r.arrayBuffer());
-                    const mime = url.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
-
-                    // 生成图片 ID 并插入
-                    const imgId = XLSX.utils.book_new_image(wb, buf, mime);
-                    XLSX.utils.sheet_add_image(ws, imgId, {
-                        tl: { col: 2, row: rowIdx },       // 第3列，“聊天内容”
+                    const buffer = await fetch(url, { mode: 'cors' }).then(r => r.arrayBuffer());
+                    const imageId = wb.addImage({ buffer, extension: ext });
+                    // 第 3 列（下标 2）位置插图；tl.row / col 都是 0-based
+                    ws.addImage(imageId, {
+                        tl: { col: 2, row: rowNumber - 1 },
                         ext: { width: 120, height: 120 }
                     });
-
-                    // 调整行高（单位 pt）
-                    ws['!rows'][rowIdx] = { hpt: 90 };
                 } catch (e) {
-                    console.error('图片插入失败:', e);
+                    console.warn(`图片 ${url} 下载失败:`, e);
                 }
             })
         );
 
-        /* 5. 写文件并下载 ----------------------------------------------- */
-        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        /* ——————————————————— 6. 写文件并下载 ——————————————————— */
+        const buf = await wb.xlsx.writeBuffer();       // Node 环境请用 writeFile
         const fileTag = rows[0]?.conversationId || '';
         saveAs(
-            new Blob([wbout], { type: 'application/octet-stream' }),
+            new Blob([buf], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            }),
             `聊天记录_${fileTag}_${new Date().toISOString().slice(0, 10)}.xlsx`
         );
 
@@ -414,6 +441,19 @@ async function exportToExcel() {
         ElMessage.error('导出失败，请稍后重试');
     }
 }
+
+async function downloadImage(url, filename = 'image') {
+    try {
+        const res = await fetch(url, { mode: 'cors' });
+        const blob = await res.blob();
+        // 若没有后缀，用 blob.type 给个默认值
+        const ext = filename.includes('.') ? '' : `.${blob.type.split('/')[1] || 'jpg'}`;
+        saveAs(blob, `${filename}${ext}`);
+    } catch (e) {
+        ElMessage.error('图片下载失败，请稍后重试');
+    }
+}
+
 
 onMounted(() => {
     load(1);
@@ -553,8 +593,25 @@ onMounted(() => {
 }
 
 .image-container {
+    position: relative;
     display: flex;
     justify-content: center;
+}
+
+.download-btn {
+    position: absolute;
+    /* 右下角 */
+    bottom: 4px;
+    right: 4px;
+    z-index: 2;
+    /* 确保按钮在图片之上 */
+    opacity: 0.85;
+    transition: opacity .2s, transform .2s;
+}
+
+.download-btn:hover {
+    opacity: 1;
+    transform: scale(1.05);
 }
 
 .message-image {

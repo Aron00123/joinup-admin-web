@@ -8,9 +8,9 @@ const RETRY_DELAY = 30000; // 30秒后重试
 
 /**
  * 启动或重启 token 刷新定时器
- * @param {number} intervalMinutes 刷新间隔，建议设置在 token 过期前（如 5 分钟）
+ * @param {number} intervalMinutes 刷新间隔，建议设置在 token 过期前（如 10 分钟）
  */
-export function scheduleTokenRefresh(intervalMinutes = 5) {
+export function scheduleTokenRefresh(intervalMinutes = 10) {
   // 清掉旧的定时器
   if (refreshTimer) {
     clearTimeout(refreshTimer);
@@ -36,23 +36,7 @@ async function refreshToken(intervalMinutes) {
 
     console.log("[tokenRefresher] 开始刷新 token...");
 
-    // const res = await request.post('/user/login', {
-    //   username: user.username,
-    //   password: user.password
-    // });
-
-    const res = await request({
-      // url: "http://localhost:8088/user/login",
-      url: "https://joinup.org.cn/api/user/login",
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: {
-        username: user.username,
-        password: user.password,
-      },
-    });
+    const res = await request.get('user/refreshToken');
 
     if (res.code === 1 && res.data?.token) {
       // 刷新成功

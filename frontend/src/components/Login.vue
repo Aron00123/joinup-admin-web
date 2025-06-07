@@ -97,7 +97,7 @@ const onLogin = () => {
                 localStorage.setItem("xm-user", JSON.stringify(user));
                 const user1 = JSON.parse(localStorage.getItem("xm-user") || "{}");
 
-                scheduleTokenRefresh(5);
+                scheduleTokenRefresh(10);
                 console.log("tokenRefresher started");
 
                 // 跳转主页
