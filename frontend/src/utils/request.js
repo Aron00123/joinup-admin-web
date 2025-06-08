@@ -3,9 +3,9 @@ import { useRouter } from "vue-router";
 
 // 创建 axios 实例
 const request = axios.create({
-    baseURL: "http://localhost:8088",
+    // baseURL: "http://localhost:8088",
     // baseURL: "https://joinup.org.cn/api-dev", // API base URL
-    // baseURL: "https://joinup.org.cn/api",
+    baseURL: "https://joinup.org.cn/api",
     headers: {
         "Content-Type": "application/json",
     },
