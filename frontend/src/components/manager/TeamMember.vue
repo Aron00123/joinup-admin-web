@@ -10,13 +10,8 @@
 
         <!-- 表格区域 -->
         <div class="table-section">
-            <el-table 
-                :data="tableData" 
-                stripe 
-                @selection-change="handleSelectionChange"
-                class="data-table"
-                v-loading="loading"
-            >
+            <el-table :data="tableData" stripe @selection-change="handleSelectionChange" class="data-table"
+                v-loading="loading">
                 <el-table-column type="selection" width="55" align="center" />
                 <el-table-column prop="id" label="序号" width="70" sortable align="center" />
                 <el-table-column prop="teamId" label="队伍编号" min-width="120" align="center" show-overflow-tooltip />
@@ -36,15 +31,8 @@
 
             <!-- 分页 -->
             <div class="pagination-section">
-                <el-pagination 
-                    background 
-                    @current-change="handleCurrentChange" 
-                    :current-page="pageNum"
-                    :page-sizes="[5, 10, 20]" 
-                    :page-size="pageSize" 
-                    layout="total, prev, pager, next" 
-                    :total="total"
-                />
+                <el-pagination background @current-change="handleCurrentChange" :current-page="pageNum"
+                    :page-sizes="[5, 10, 20]" :page-size="pageSize" layout="total, prev, pager, next" :total="total" />
             </div>
         </div>
     </div>
@@ -68,7 +56,7 @@ const ids = ref([]);
 const load = (page = 1) => {
     pageNum.value = page;
     loading.value = true;
-    
+
     Promise.all([
         request.get("/admin/team-member/count"),
         request.get("/admin/team-member/list", {
@@ -193,11 +181,11 @@ onMounted(() => {
     .team-member-management {
         padding: 12px;
     }
-    
+
     .operation-section {
         flex-direction: column;
     }
-    
+
     .batch-delete-btn {
         width: 100%;
     }

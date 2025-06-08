@@ -3,21 +3,15 @@
         <!-- 搜索区域 -->
         <div class="search-section">
             <div class="search-group">
-                <el-autocomplete 
-                    v-model="id" 
-                    :fetch-suggestions="querySearchNotice" 
-                    :trigger-on-focus="false"
-                    clearable 
-                    class="search-input" 
-                    placeholder="请输入公告标题查询"
-                >
+                <el-autocomplete v-model="id" :fetch-suggestions="querySearchNotice" :trigger-on-focus="false" clearable
+                    class="search-input" placeholder="请输入公告标题查询">
                     <template #prefix>
                         <i class="el-icon-search"></i>
                     </template>
                 </el-autocomplete>
                 <el-button type="primary" @click="querySearchAdmin(1)" class="search-btn">查询</el-button>
             </div>
-            
+
             <el-button type="warning" plain @click="reset" class="reset-btn">
                 <i class="el-icon-refresh"></i>
                 重置
@@ -38,13 +32,8 @@
 
         <!-- 表格区域 -->
         <div class="table-section">
-            <el-table 
-                :data="tableData" 
-                stripe 
-                @selection-change="handleSelectionChange"
-                class="data-table"
-                v-loading="loading"
-            >
+            <el-table :data="tableData" stripe @selection-change="handleSelectionChange" class="data-table"
+                v-loading="loading">
                 <el-table-column type="selection" width="55" align="center" />
                 <el-table-column prop="id" label="序号" width="70" sortable align="center" />
                 <el-table-column prop="title" label="标题" min-width="180" show-overflow-tooltip />
@@ -68,46 +57,21 @@
 
             <!-- 分页 -->
             <div class="pagination-section">
-                <el-pagination 
-                    background 
-                    @current-change="handleCurrentChange" 
-                    :current-page="pageNum"
-                    :page-sizes="[5, 10, 20]" 
-                    :page-size="pageSize" 
-                    layout="total, prev, pager, next" 
-                    :total="total"
-                />
+                <el-pagination background @current-change="handleCurrentChange" :current-page="pageNum"
+                    :page-sizes="[5, 10, 20]" :page-size="pageSize" layout="total, prev, pager, next" :total="total" />
             </div>
         </div>
 
         <!-- 新增/编辑对话框 -->
-        <el-dialog 
-            title="公告信息" 
-            v-model="formVisible" 
-            width="600px" 
-            :close-on-click-modal="false" 
-            destroy-on-close
-            class="notice-dialog"
-        >
-            <el-form 
-                :model="form" 
-                label-width="100px" 
-                :rules="rules" 
-                ref="formRef"
-                class="notice-form"
-            >
+        <el-dialog title="公告信息" v-model="formVisible" width="600px" :close-on-click-modal="false" destroy-on-close
+            class="notice-dialog">
+            <el-form :model="form" label-width="100px" :rules="rules" ref="formRef" class="notice-form">
                 <el-form-item label="标题" prop="title">
                     <el-input v-model="form.title" placeholder="请输入公告标题" />
                 </el-form-item>
                 <el-form-item label="内容" prop="content">
-                    <el-input 
-                        type="textarea" 
-                        :rows="6" 
-                        v-model="form.content" 
-                        placeholder="请输入公告内容"
-                        maxlength="1000"
-                        show-word-limit
-                    />
+                    <el-input type="textarea" :rows="6" v-model="form.content" placeholder="请输入公告内容" maxlength="1000"
+                        show-word-limit />
                 </el-form-item>
             </el-form>
 
@@ -145,10 +109,10 @@ const ids = ref([]);
 const load = (page = 1) => {
     pageNum.value = page;
     loading.value = true;
-    
+
     request.post("/notice/selectPage", {
-        pageNum: pageNum.value, 
-        pageSize: pageSize.value, 
+        pageNum: pageNum.value,
+        pageSize: pageSize.value,
         username: id.value
     }).then((res) => {
         tableData.value = res.data?.list || [];
@@ -182,10 +146,10 @@ const querySearchNotice = (queryString, cb) => {
 const querySearchAdmin = (page) => {
     if (page) pageNum.value = page;
     loading.value = true;
-    
+
     request.post("/notice/querySearchAdmin", {
-        pageNum: pageNum.value, 
-        pageSize: pageSize.value, 
+        pageNum: pageNum.value,
+        pageSize: pageSize.value,
         id: id.value
     }).then((res) => {
         tableData.value = res.data.list || [];
@@ -222,7 +186,7 @@ const handleEdit = (row) => {
 
 const save = () => {
     saveLoading.value = true;
-    
+
     const date = new Date();
     let year = date.getFullYear();
     let month = date.getMonth() + 1;
@@ -394,7 +358,8 @@ onMounted(() => {
 }
 
 .notice-dialog :deep(.el-dialog__header) {
-    background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%);;
+    background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%);
+    ;
     color: white;
     border-radius: 12px 12px 0 0;
     padding: 20px;
@@ -414,25 +379,25 @@ onMounted(() => {
     .notice-management {
         padding: 12px;
     }
-    
+
     .search-section {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .search-group {
         justify-content: space-between;
     }
-    
+
     .search-input {
         flex: 1;
         max-width: none;
     }
-    
+
     .operation-section {
         flex-direction: column;
     }
-    
+
     .add-btn,
     .batch-delete-btn {
         width: 100%;

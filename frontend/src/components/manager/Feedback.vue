@@ -105,12 +105,12 @@ const userCache = ref(new Map()); // 缓存用户信息，避免重复请求
 // 2. 根据用户ID获取用户名的函数
 const getUsernameById = async (senderId) => {
     if (!senderId) return '未知用户';
-    
+
     // 先检查缓存
     if (userCache.value.has(senderId)) {
         return userCache.value.get(senderId);
     }
-    
+
     try {
         const res = await request.get("/admin/user/searchStudentId", {
             params: {
@@ -119,7 +119,7 @@ const getUsernameById = async (senderId) => {
                 size: 1,
             }
         });
-        
+
         const username = res.records?.[0]?.username || '未知用户';
         // 缓存结果
         userCache.value.set(senderId, username);
@@ -134,7 +134,7 @@ const getUsernameById = async (senderId) => {
 const processUsernames = async (data) => {
     // 获取所有唯一的senderId
     const senderIds = [...new Set(data.map(item => item.senderId).filter(Boolean))];
-    
+
     // 批量获取用户名
     await Promise.all(
         senderIds.map(async (senderId) => {
@@ -143,7 +143,7 @@ const processUsernames = async (data) => {
             }
         })
     );
-    
+
     // 为每条记录添加username字段
     return data.map(item => ({
         ...item,
@@ -185,18 +185,18 @@ const load = async (page = 1) => {
 
     try {
         const [countRes, listRes] = await Promise.all([
-        request.get("/admin/message/feedback/count"),
-        request.get("/admin/message/feedback/list", {
-            params: {
-                page: pageNum.value,
-                size: pageSize.value,
-            }
-        })
-    ]);
+            request.get("/admin/message/feedback/count"),
+            request.get("/admin/message/feedback/list", {
+                params: {
+                    page: pageNum.value,
+                    size: pageSize.value,
+                }
+            })
+        ]);
 
-    total.value = Number(countRes.data) || 0;
+        total.value = Number(countRes.data) || 0;
         const rawData = listRes.records || [];
-        
+
         // 处理用户名转换
         tableData.value = await processUsernames(rawData);
 

@@ -3,21 +3,15 @@
         <!-- 搜索区域 -->
         <div class="search-section">
             <div class="search-group">
-                <el-autocomplete 
-                    v-model="teamName" 
-                    :fetch-suggestions="querySearch" 
-                    :trigger-on-focus="false"
-                    clearable 
-                    class="search-input" 
-                    placeholder="请输入队伍名称查询"
-                >
+                <el-autocomplete v-model="teamName" :fetch-suggestions="querySearch" :trigger-on-focus="false" clearable
+                    class="search-input" placeholder="请输入队伍名称查询">
                     <template #prefix>
                         <i class="el-icon-search"></i>
                     </template>
                 </el-autocomplete>
                 <el-button type="primary" @click="search(1)" class="search-btn">查询</el-button>
             </div>
-            
+
             <el-button type="warning" plain @click="reset" class="reset-btn">
                 <i class="el-icon-refresh"></i>
                 重置
@@ -34,13 +28,8 @@
 
         <!-- 表格区域 -->
         <div class="table-section">
-            <el-table 
-                :data="tableData" 
-                stripe 
-                @selection-change="handleSelectionChange"
-                class="data-table"
-                v-loading="loading"
-            >
+            <el-table :data="tableData" stripe @selection-change="handleSelectionChange" class="data-table"
+                v-loading="loading">
                 <el-table-column type="selection" width="55" align="center" />
                 <el-table-column prop="id" label="序号" width="70" sortable align="center" />
                 <el-table-column prop="name" label="名称" min-width="150" show-overflow-tooltip />
@@ -72,76 +61,34 @@
 
             <!-- 分页 -->
             <div class="pagination-section">
-                <el-pagination 
-                    background 
-                    @current-change="handleCurrentChange" 
-                    :current-page="pageNum"
-                    :page-sizes="[5, 10, 20]" 
-                    :page-size="pageSize" 
-                    layout="total, prev, pager, next" 
-                    :total="total"
-                />
+                <el-pagination background @current-change="handleCurrentChange" :current-page="pageNum"
+                    :page-sizes="[5, 10, 20]" :page-size="pageSize" layout="total, prev, pager, next" :total="total" />
             </div>
         </div>
 
         <!-- 编辑对话框 -->
-        <el-dialog 
-            title="队伍信息" 
-            v-model="formVisible" 
-            width="500px" 
-            :close-on-click-modal="false" 
-            destroy-on-close
-            class="team-dialog"
-        >
-            <el-form 
-                :model="form" 
-                label-width="100px" 
-                :rules="rules" 
-                ref="formRef"
-                class="team-form"
-            >
+        <el-dialog title="队伍信息" v-model="formVisible" width="500px" :close-on-click-modal="false" destroy-on-close
+            class="team-dialog">
+            <el-form :model="form" label-width="100px" :rules="rules" ref="formRef" class="team-form">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" placeholder="请输入队伍名称" />
                 </el-form-item>
                 <el-form-item label="介绍" prop="description">
-                    <el-input 
-                        type="textarea" 
-                        :rows="3" 
-                        v-model="form.description" 
-                        placeholder="请输入队伍介绍"
-                        maxlength="500"
-                        show-word-limit
-                    />
+                    <el-input type="textarea" :rows="3" v-model="form.description" placeholder="请输入队伍介绍" maxlength="500"
+                        show-word-limit />
                 </el-form-item>
                 <el-form-item label="最大人数" prop="maxMembers">
-                    <el-input-number 
-                        v-model="form.maxMembers" 
-                        :min="1" 
-                        :max="100"
-                        placeholder="最大人数"
-                        style="width: 100%"
-                    />
+                    <el-input-number v-model="form.maxMembers" :min="1" :max="100" placeholder="最大人数"
+                        style="width: 100%" />
                 </el-form-item>
                 <el-form-item label="是否公开" prop="open">
-                    <el-switch 
-                        v-model="form.open" 
-                        active-text="公开"
-                        inactive-text="私有"
-                    />
+                    <el-switch v-model="form.open" active-text="公开" inactive-text="私有" />
                 </el-form-item>
                 <el-form-item label="主题ID" prop="themeId">
-                    <el-input-number 
-                        v-model="form.themeId" 
-                        :min="1"
-                        placeholder="主题ID"
-                        style="width: 100%"
-                    />
+                    <el-input-number v-model="form.themeId" :min="1" placeholder="主题ID" style="width: 100%" />
                 </el-form-item>
                 <el-form-item label="标签" prop="tagIds">
-                    <el-input 
-                        v-model="form.tagIds" 
-                        placeholder="请输入标签，多个标签用逗号分隔"
-                    />
+                    <el-input v-model="form.tagIds" placeholder="请输入标签，多个标签用逗号分隔" />
                 </el-form-item>
             </el-form>
 
@@ -179,7 +126,7 @@ const ids = ref([]);
 const load = (page = 1) => {
     pageNum.value = page;
     loading.value = true;
-    
+
     Promise.all([
         request.get("/admin/team/count"),
         request.get("/admin/team/list", {
@@ -213,7 +160,7 @@ const handleEdit = (row) => {
 
 const save = () => {
     saveLoading.value = true;
-    
+
     request.put(`/admin/team/update/${form.id}`, {
         name: form.name,
         description: form.description,
@@ -230,9 +177,9 @@ const save = () => {
             ElMessage.error(res.msg);
         }
     }).catch(() => ElMessage.error('请求失败，请稍后重试'))
-    .finally(() => {
-        saveLoading.value = false;
-    });
+        .finally(() => {
+            saveLoading.value = false;
+        });
 };
 
 const closeDialog = () => {
@@ -311,7 +258,7 @@ const querySearch = (queryString, cb) => {
 const search = (page) => {
     if (page) pageNum.value = page;
     loading.value = true;
-    
+
     Promise.all([
         request.get("/admin/team/searchCount", {
             params: { name: teamName.value }
@@ -447,25 +394,25 @@ onMounted(() => {
     .team-management {
         padding: 12px;
     }
-    
+
     .search-section {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .search-group {
         justify-content: space-between;
     }
-    
+
     .search-input {
         flex: 1;
         max-width: none;
     }
-    
+
     .operation-section {
         flex-direction: column;
     }
-    
+
     .batch-delete-btn {
         width: 100%;
     }

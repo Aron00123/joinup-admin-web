@@ -4,27 +4,13 @@
         <div class="search-section">
             <div class="search-group">
                 <div class="switch-container">
-                    <el-switch 
-                        v-model="autoFetch" 
-                        active-text="自动加载接口数据" 
-                        inactive-text="手动加载接口数据" 
-                        @change="onAutoFetchChange"
-                        size="default"
-                        class="auto-switch"
-                    />
+                    <el-switch v-model="autoFetch" active-text="自动加载接口数据" inactive-text="手动加载接口数据"
+                        @change="onAutoFetchChange" size="default" class="auto-switch" />
                 </div>
                 <div class="search-controls">
-                    <el-date-picker 
-                        v-model="dateRange" 
-                        type="daterange" 
-                        range-separator="至" 
-                        start-placeholder="开始日期"
-                        end-placeholder="结束日期" 
-                        format="YYYY-MM-DD" 
-                        value-format="YYYY-MM-DD" 
-                        size="default"
-                        class="date-picker"
-                    />
+                    <el-date-picker v-model="dateRange" type="daterange" range-separator="至" start-placeholder="开始日期"
+                        end-placeholder="结束日期" format="YYYY-MM-DD" value-format="YYYY-MM-DD" size="default"
+                        class="date-picker" />
                     <el-button type="primary" @click="onSearch" class="search-btn">
                         <i class="el-icon-search"></i>
                         查询
@@ -80,12 +66,8 @@
                         <p class="empty-text">{{ autoFetch ? '暂无数据' : '请开启自动加载或点击查询按钮获取数据' }}</p>
                     </div>
                     <el-timeline v-else class="stats-timeline">
-                        <el-timeline-item 
-                            v-for="item in currentStats" 
-                            :key="statType + '-' + itemKey(item)"
-                            placement="top"
-                            class="timeline-item"
-                        >
+                        <el-timeline-item v-for="item in currentStats" :key="statType + '-' + itemKey(item)"
+                            placement="top" class="timeline-item">
                             <el-card shadow="hover" class="stat-card">
                                 <div class="stat-card-content">
                                     <div class="stat-header">
@@ -114,11 +96,11 @@ import { onMounted, ref, watch, computed } from "vue";
 import request from "../../utils/request"; // 引入封装的 axios 实例
 
 const autoFetch = ref(
-  localStorage.getItem('autoFetch') === 'true'
+    localStorage.getItem('autoFetch') === 'true'
 );
 
 watch(autoFetch, val => {
-  localStorage.setItem('autoFetch', val.toString());
+    localStorage.setItem('autoFetch', val.toString());
 });
 
 /* 日期区间；默认 null 表示未选 */
@@ -272,7 +254,8 @@ onMounted(() => {
 
 /* 欢迎卡片 */
 .welcome-card {
-    background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%);;
+    background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%);
+    ;
     border-radius: 12px;
     margin-bottom: 20px;
     box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
@@ -404,7 +387,8 @@ onMounted(() => {
 .timeline-item :deep(.el-timeline-item__node) {
     width: 16px;
     height: 16px;
-    background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%);;
+    background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%);
+    ;
     border: 3px solid white;
     box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
@@ -439,7 +423,8 @@ onMounted(() => {
     width: 40px;
     height: 40px;
     border-radius: 10px;
-    background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%);;
+    background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%);
+    ;
     color: white;
     font-size: 18px;
     margin-right: 12px;
@@ -480,49 +465,49 @@ onMounted(() => {
     .stats-management {
         padding: 12px;
     }
-    
+
     .search-group {
         flex-direction: column;
         align-items: stretch;
         gap: 16px;
     }
-    
+
     .search-controls {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
     }
-    
+
     .date-picker {
         min-width: auto;
         width: 100%;
     }
-    
+
     .search-btn,
     .reset-btn {
         width: 100%;
     }
-    
+
     .stats-header {
         flex-direction: column;
         gap: 16px;
         align-items: stretch;
     }
-    
+
     .dimension-selector {
         justify-content: center;
     }
-    
+
     .welcome-content {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .welcome-icon {
         margin-right: 0;
         margin-bottom: 12px;
     }
-    
+
     .stat-value {
         flex-direction: column;
         gap: 8px;
@@ -534,15 +519,15 @@ onMounted(() => {
     .stats-content {
         padding: 12px;
     }
-    
+
     .timeline-item :deep(.el-timeline-item__wrapper) {
         padding-left: 12px;
     }
-    
+
     .stat-card-content {
         padding: 2px;
     }
-    
+
     .stats-scrollbar {
         height: 350px !important;
     }
