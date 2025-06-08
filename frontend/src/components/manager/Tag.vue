@@ -3,21 +3,15 @@
         <!-- 搜索区域 -->
         <div class="search-section">
             <div class="search-group">
-                <el-autocomplete 
-                    v-model="tagName" 
-                    :fetch-suggestions="querySearch" 
-                    :trigger-on-focus="false"
-                    clearable 
-                    class="search-input" 
-                    placeholder="请输入标签名称查询"
-                >
+                <el-autocomplete v-model="tagName" :fetch-suggestions="querySearch" :trigger-on-focus="false" clearable
+                    class="search-input" placeholder="请输入标签名称查询">
                     <template #prefix>
                         <i class="el-icon-search"></i>
                     </template>
                 </el-autocomplete>
                 <el-button type="primary" @click="search(1)" class="search-btn">查询</el-button>
             </div>
-            
+
             <el-button type="warning" plain @click="reset" class="reset-btn">
                 <i class="el-icon-refresh"></i>
                 重置
@@ -38,13 +32,8 @@
 
         <!-- 表格区域 -->
         <div class="table-section">
-            <el-table 
-                :data="tableData" 
-                stripe 
-                @selection-change="handleSelectionChange"
-                class="data-table"
-                v-loading="loading"
-            >
+            <el-table :data="tableData" stripe @selection-change="handleSelectionChange" class="data-table"
+                v-loading="loading">
                 <el-table-column type="selection" width="55" align="center" />
                 <el-table-column prop="id" label="序号" width="70" sortable align="center" />
                 <el-table-column prop="name" label="名称" min-width="150" show-overflow-tooltip />
@@ -68,46 +57,21 @@
 
             <!-- 分页 -->
             <div class="pagination-section">
-                <el-pagination 
-                    background 
-                    @current-change="handleCurrentChange" 
-                    :current-page="pageNum"
-                    :page-sizes="[5, 10, 20]" 
-                    :page-size="pageSize" 
-                    layout="total, prev, pager, next" 
-                    :total="total"
-                />
+                <el-pagination background @current-change="handleCurrentChange" :current-page="pageNum"
+                    :page-sizes="[5, 10, 20]" :page-size="pageSize" layout="total, prev, pager, next" :total="total" />
             </div>
         </div>
 
         <!-- 新增/编辑对话框 -->
-        <el-dialog 
-            title="标签信息" 
-            v-model="formVisible" 
-            width="500px" 
-            :close-on-click-modal="false" 
-            destroy-on-close
-            class="tag-dialog"
-        >
-            <el-form 
-                :model="form" 
-                label-width="100px" 
-                :rules="rules" 
-                ref="formRef"
-                class="tag-form"
-            >
+        <el-dialog title="标签信息" v-model="formVisible" width="500px" :close-on-click-modal="false" destroy-on-close
+            class="tag-dialog">
+            <el-form :model="form" label-width="100px" :rules="rules" ref="formRef" class="tag-form">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" placeholder="请输入标签名称" />
                 </el-form-item>
                 <el-form-item label="描述" prop="description">
-                    <el-input 
-                        type="textarea" 
-                        :rows="4" 
-                        v-model="form.description" 
-                        placeholder="请输入标签描述"
-                        maxlength="500"
-                        show-word-limit
-                    />
+                    <el-input type="textarea" :rows="4" v-model="form.description" placeholder="请输入标签描述" maxlength="500"
+                        show-word-limit />
                 </el-form-item>
             </el-form>
 
@@ -145,7 +109,7 @@ const ids = ref([]);
 const load = (page = 1) => {
     pageNum.value = page;
     loading.value = true;
-    
+
     Promise.all([
         request.get("/admin/tag/count"),
         request.get("/admin/tag/list", {
@@ -189,7 +153,7 @@ const handleEdit = (row) => {
 
 const save = () => {
     saveLoading.value = true;
-    
+
     if (isHandleAdd.value) {
         request.post("/admin/tag/add", {
             name: form.name,
@@ -203,10 +167,10 @@ const save = () => {
                 ElMessage.error(res.msg);
             }
         }).catch(() => ElMessage.error('请求失败，请稍后重试'))
-        .finally(() => {
-            saveLoading.value = false;
-            isHandleAdd.value = false;
-        });
+            .finally(() => {
+                saveLoading.value = false;
+                isHandleAdd.value = false;
+            });
     } else {
         request.put(`/admin/tag/update/${form.id}`, {
             name: form.name,
@@ -220,9 +184,9 @@ const save = () => {
                 ElMessage.error(res.msg);
             }
         }).catch(() => ElMessage.error('请求失败，请稍后重试'))
-        .finally(() => {
-            saveLoading.value = false;
-        });
+            .finally(() => {
+                saveLoading.value = false;
+            });
     }
 };
 
@@ -298,7 +262,7 @@ const querySearch = (queryString, cb) => {
 const search = (page) => {
     if (page) pageNum.value = page;
     loading.value = true;
-    
+
     Promise.all([
         request.get("/admin/tag/searchCount", {
             params: { name: tagName.value }
@@ -400,7 +364,8 @@ onMounted(() => {
 }
 
 .data-table :deep(.el-table__row) {
-    height: 60px; /* 调整为你想要的高度 */
+    height: 60px;
+    /* 调整为你想要的高度 */
 }
 
 /* 分页区域 */
@@ -418,7 +383,8 @@ onMounted(() => {
 }
 
 .tag-dialog :deep(.el-dialog__header) {
-    background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%);;
+    background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%);
+    ;
     color: white;
     border-radius: 12px 12px 0 0;
     padding: 20px;
@@ -438,25 +404,25 @@ onMounted(() => {
     .tag-management {
         padding: 12px;
     }
-    
+
     .search-section {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .search-group {
         justify-content: space-between;
     }
-    
+
     .search-input {
         flex: 1;
         max-width: none;
     }
-    
+
     .operation-section {
         flex-direction: column;
     }
-    
+
     .add-btn,
     .batch-delete-btn {
         width: 100%;

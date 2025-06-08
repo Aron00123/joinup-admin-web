@@ -3,35 +3,24 @@
         <!-- 搜索区域 -->
         <div class="search-section">
             <div class="search-group">
-                <el-input 
-                    placeholder="请输入学号查询" 
-                    v-model="studentId" 
-                    class="search-input"
-                    clearable
-                >
+                <el-input placeholder="请输入学号查询" v-model="studentId" class="search-input" clearable>
                     <template #prefix>
                         <i class="el-icon-search"></i>
                     </template>
                 </el-input>
                 <el-button type="primary" @click="searchStudentId(1)" class="search-btn">查询</el-button>
             </div>
-            
+
             <div class="search-group">
-                <el-autocomplete 
-                    v-model="username" 
-                    :fetch-suggestions="querySearchUsername" 
-                    :trigger-on-focus="false" 
-                    clearable
-                    class="search-input"
-                    placeholder="请输入用户名查询"
-                >
+                <el-autocomplete v-model="username" :fetch-suggestions="querySearchUsername" :trigger-on-focus="false"
+                    clearable class="search-input" placeholder="请输入用户名查询">
                     <template #prefix>
                         <i class="el-icon-user"></i>
                     </template>
                 </el-autocomplete>
                 <el-button type="primary" @click="searchUsername(1)" class="search-btn">查询</el-button>
             </div>
-            
+
             <el-button type="warning" plain @click="reset" class="reset-btn">
                 <i class="el-icon-refresh"></i>
                 重置
@@ -48,13 +37,8 @@
 
         <!-- 表格区域 -->
         <div class="table-section">
-            <el-table 
-                :data="tableData" 
-                stripe 
-                @selection-change="handleSelectionChange"
-                class="data-table"
-                v-loading="loading"
-            >
+            <el-table :data="tableData" stripe @selection-change="handleSelectionChange" class="data-table"
+                v-loading="loading">
                 <el-table-column type="selection" width="55" align="center" />
                 <el-table-column prop="id" label="序号" width="70" sortable align="center" />
                 <el-table-column prop="username" label="用户名" width="150" align="center" />
@@ -63,10 +47,8 @@
                         <div class="avatar-wrapper">
                             <el-image
                                 :src="scope.row.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'"
-                                fit="cover"
-                                class="table-avatar"
-                                :preview-src-list="[scope.row.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png']"
-                            />
+                                fit="cover" class="table-avatar"
+                                :preview-src-list="[scope.row.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png']" />
                         </div>
                     </template>
                 </el-table-column>
@@ -81,7 +63,7 @@
                 <el-table-column prop="verified" label="认证状态" width="100" align="center">
                     <template #default="scope">
                         <el-tag :type="scope.row.verified === '已认证' ? 'success' : 'warning'" size="small">
-                            {{ scope.row.verified || '未认证' }}
+                            {{ scope.row.verified ? '已认证' : '未认证' }}
                         </el-tag>
                     </template>
                 </el-table-column>
@@ -103,34 +85,15 @@
 
             <!-- 分页 -->
             <div class="pagination-section">
-                <el-pagination 
-                    background 
-                    @current-change="handleCurrentChange" 
-                    :current-page="pageNum"
-                    :page-sizes="[5, 10, 20]" 
-                    :page-size="pageSize" 
-                    layout="total, prev, pager, next" 
-                    :total="total"
-                />
+                <el-pagination background @current-change="handleCurrentChange" :current-page="pageNum"
+                    :page-sizes="[5, 10, 20]" :page-size="pageSize" layout="total, prev, pager, next" :total="total" />
             </div>
         </div>
 
         <!-- 编辑对话框 -->
-        <el-dialog 
-            title="用户信息" 
-            v-model="formVisible" 
-            width="500px" 
-            :close-on-click-modal="false" 
-            destroy-on-close
-            class="user-dialog"
-        >
-            <el-form 
-                :model="form" 
-                label-width="100px" 
-                :rules="rules" 
-                ref="formRef"
-                class="user-form"
-            >
+        <el-dialog title="用户信息" v-model="formVisible" width="500px" :close-on-click-modal="false" destroy-on-close
+            class="user-dialog">
+            <el-form :model="form" label-width="100px" :rules="rules" ref="formRef" class="user-form">
                 <el-form-item label="用户名" prop="username">
                     <el-input v-model="form.username" disabled />
                 </el-form-item>
@@ -188,7 +151,7 @@ const ids = ref([]);
 const load = (page = 1) => {
     pageNum.value = page;
     loading.value = true;
-    
+
     Promise.all([
         request.get("/admin/user/count"),
         request.get("/admin/user/list", {
@@ -238,9 +201,9 @@ const save = () => {
             ElMessage.error(res.msg);
         }
     }).catch(() => ElMessage.error('请求失败，请稍后重试'))
-    .finally(() => {
-        saveLoading.value = false;
-    });
+        .finally(() => {
+            saveLoading.value = false;
+        });
 };
 
 const closeDialog = () => {
@@ -314,7 +277,7 @@ const querySearchUsername = (queryString, cb) => {
 const searchUsername = (page) => {
     if (page) pageNum.value = page;
     loading.value = true;
-    
+
     Promise.all([
         request.get("/admin/user/searchCountUsername", {
             params: { username: username.value }
@@ -339,7 +302,7 @@ const searchUsername = (page) => {
 const searchStudentId = (page) => {
     if (page) pageNum.value = page;
     loading.value = true;
-    
+
     Promise.all([
         request.get("/admin/user/searchCountStudentId", {
             params: { studentId: studentId.value }
@@ -464,7 +427,8 @@ onMounted(() => {
 }
 
 .user-dialog :deep(.el-dialog__header) {
-    background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%);;
+    background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%);
+    ;
     color: white;
     border-radius: 12px 12px 0 0;
     padding: 20px;
@@ -484,16 +448,16 @@ onMounted(() => {
     .user-management {
         padding: 12px;
     }
-    
+
     .search-section {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .search-group {
         justify-content: space-between;
     }
-    
+
     .search-input {
         flex: 1;
         max-width: none;

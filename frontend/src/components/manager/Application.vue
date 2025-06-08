@@ -3,21 +3,15 @@
         <!-- 搜索区域 -->
         <div class="search-section">
             <div class="search-group">
-                <el-autocomplete 
-                    v-model="themeName" 
-                    :fetch-suggestions="querySearchTheme" 
-                    :trigger-on-focus="false"
-                    clearable 
-                    class="search-input" 
-                    placeholder="请输入标签名称查询"
-                >
+                <el-autocomplete v-model="themeName" :fetch-suggestions="querySearchTheme" :trigger-on-focus="false"
+                    clearable class="search-input" placeholder="请输入标签名称查询">
                     <template #prefix>
                         <i class="el-icon-search"></i>
                     </template>
                 </el-autocomplete>
                 <el-button type="primary" @click="search(1)" class="search-btn">查询</el-button>
             </div>
-            
+
             <el-button type="warning" plain @click="reset" class="reset-btn">
                 <i class="el-icon-refresh"></i>
                 重置
@@ -26,24 +20,15 @@
 
         <!-- 表格区域 -->
         <div class="table-section">
-            <el-table 
-                :data="tableData" 
-                stripe 
-                @selection-change="handleSelectionChange"
-                class="data-table"
-                v-loading="loading"
-            >
+            <el-table :data="tableData" stripe @selection-change="handleSelectionChange" class="data-table"
+                v-loading="loading">
                 <el-table-column type="selection" width="55" align="center" />
                 <el-table-column prop="id" label="序号" width="70" sortable align="center" />
                 <el-table-column prop="name" label="名称" min-width="150" show-overflow-tooltip />
                 <el-table-column prop="description" label="描述" min-width="180" show-overflow-tooltip />
                 <el-table-column prop="status" label="状态" width="120" align="center" show-overflow-tooltip>
                     <template #default="{ row }">
-                        <el-tag 
-                            :type="getStatusType(row.status)" 
-                            size="small"
-                            effect="light"
-                        >
+                        <el-tag :type="getStatusType(row.status)" size="small" effect="light">
                             {{ row.status }}
                         </el-tag>
                     </template>
@@ -53,9 +38,7 @@
                     <template #default="{ row }">
                         <el-avatar
                             :src="row.submitterUserAvatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'"
-                            :size="40"
-                            fit="cover"
-                        />
+                            :size="40" fit="cover" />
                     </template>
                 </el-table-column>
                 <el-table-column prop="createTime" label="创建时间" width="180" align="center" />
@@ -67,25 +50,13 @@
                             <i class="el-icon-view"></i>
                             查看
                         </el-button>
-                        <el-button 
-                            size="small" 
-                            type="success" 
-                            link
-                            :disabled="row.finishTime != null || loadingReview"
-                            :loading="loadingReview"
-                            @click="reviewTagApplication(row.id, 0)"
-                        >
+                        <el-button size="small" type="success" link :disabled="row.finishTime != null || loadingReview"
+                            :loading="loadingReview" @click="reviewTagApplication(row.id, 0)">
                             <i class="el-icon-check"></i>
                             通过
                         </el-button>
-                        <el-button 
-                            size="small" 
-                            type="warning" 
-                            link
-                            :disabled="row.finishTime != null || loadingReview"
-                            :loading="loadingReview"
-                            @click="reviewTagApplication(row.id, 1)"
-                        >
+                        <el-button size="small" type="warning" link :disabled="row.finishTime != null || loadingReview"
+                            :loading="loadingReview" @click="reviewTagApplication(row.id, 1)">
                             <i class="el-icon-close"></i>
                             不通过
                         </el-button>
@@ -95,49 +66,23 @@
 
             <!-- 分页 -->
             <div class="pagination-section">
-                <el-pagination 
-                    background 
-                    @current-change="handleCurrentChange" 
-                    :current-page="pageNum"
-                    :page-sizes="[5, 10, 20]" 
-                    :page-size="pageSize" 
-                    layout="total, prev, pager, next" 
-                    :total="total"
-                />
+                <el-pagination background @current-change="handleCurrentChange" :current-page="pageNum"
+                    :page-sizes="[5, 10, 20]" :page-size="pageSize" layout="total, prev, pager, next" :total="total" />
             </div>
         </div>
 
         <!-- 查看详情对话框 -->
-        <el-dialog 
-            title="标签申请详情" 
-            v-model="formVisible" 
-            width="500px" 
-            :close-on-click-modal="false" 
-            destroy-on-close
-            class="application-dialog"
-        >
-            <el-form 
-                :model="form" 
-                label-width="100px" 
-                class="application-form"
-            >
+        <el-dialog title="标签申请详情" v-model="formVisible" width="500px" :close-on-click-modal="false" destroy-on-close
+            class="application-dialog">
+            <el-form :model="form" label-width="100px" class="application-form">
                 <el-form-item label="名称">
                     <el-input v-model="form.name" :disabled="isViewMode" />
                 </el-form-item>
                 <el-form-item label="描述">
-                    <el-input 
-                        type="textarea" 
-                        :rows="4" 
-                        v-model="form.description" 
-                        :disabled="isViewMode"
-                    />
+                    <el-input type="textarea" :rows="4" v-model="form.description" :disabled="isViewMode" />
                 </el-form-item>
                 <el-form-item label="状态">
-                    <el-tag 
-                        :type="getStatusType(form.status)" 
-                        size="medium"
-                        effect="light"
-                    >
+                    <el-tag :type="getStatusType(form.status)" size="medium" effect="light">
                         {{ form.status }}
                     </el-tag>
                 </el-form-item>
@@ -145,10 +90,7 @@
                     <div class="submitter-info">
                         <el-avatar
                             :src="form.submitterUserAvatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'"
-                            :size="30"
-                            fit="cover"
-                            class="submitter-avatar"
-                        />
+                            :size="30" fit="cover" class="submitter-avatar" />
                         <span class="submitter-name">{{ form.submitterUserName }}</span>
                     </div>
                 </el-form-item>
@@ -201,7 +143,7 @@ const getStatusType = (status) => {
 const load = (page = 1) => {
     pageNum.value = page;
     loading.value = true;
-    
+
     Promise.all([
         request.get("/admin/tag/applications/count"),
         request.get("/admin/tag/applications/list", {
@@ -285,7 +227,7 @@ const querySearchTheme = (queryString, cb) => {
 const search = (page) => {
     if (page) pageNum.value = page;
     loading.value = true;
-    
+
     Promise.all([
         request.get("/admin/tag/applications/searchCount", {
             params: { name: themeName.value }
@@ -384,7 +326,8 @@ onMounted(() => {
 }
 
 .application-dialog :deep(.el-dialog__header) {
-    background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%);;
+    background: linear-gradient(135deg, #70deac 0%, #8ea1f4 100%);
+    ;
     color: white;
     border-radius: 12px 12px 0 0;
     padding: 20px;
@@ -425,16 +368,16 @@ onMounted(() => {
     .tag-application-management {
         padding: 12px;
     }
-    
+
     .search-section {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .search-group {
         justify-content: space-between;
     }
-    
+
     .search-input {
         flex: 1;
         max-width: none;

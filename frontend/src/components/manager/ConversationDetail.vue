@@ -33,22 +33,13 @@
                 <el-table-column type="selection" width="55" align="center" />
                 <el-table-column prop="id" label="序号" width="140" sortable align="center" />
 
-                <!-- 会话编号：这里只是展示，不再跳链 -->
-                <!-- <el-table-column prop="conversationId" label="会话编号" width="360" align="center">
-                    <template #default="scope">
-                        <el-tag type="info" size="small">
-                            {{ scope.row.conversationId }}
-                        </el-tag>
-                    </template>
-</el-table-column> -->
-
                 <!-- 聊天内容、发送者、时间，与原列表完全一致 ↓ -->
                 <el-table-column label="聊天内容" show-overflow-tooltip>
                     <template #default="{ row }">
                         <div class="chat-content">
                             <div v-if="row.type === 'IMAGE'" class="image-message">
                                 <div class="image-info">
-                                    <span class="image-label">图片消息:</span>
+                                    <span class="image-label">image:</span>
                                     <span class="image-name">{{ row.content.name }}</span>
                                 </div>
                                 <div class="image-container">
@@ -190,7 +181,7 @@ const load = async (page = 1) => {
     try {
         const res = await request.post(
             `/admin/message/chat/${conversationId}/filter`,
-            { pageNumber: pageNum.value, pageSize: pageSize.value }            // 你的 DTO 字段名若不同，请同步调整
+            { pageNumber: pageNum.value, pageSize: pageSize.value }
         );
 
         /* === 新接口格式 ============================= */
