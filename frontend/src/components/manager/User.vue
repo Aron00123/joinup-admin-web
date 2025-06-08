@@ -42,16 +42,6 @@
                 <el-table-column type="selection" width="55" align="center" />
                 <el-table-column prop="id" label="序号" width="70" sortable align="center" />
                 <el-table-column prop="username" label="用户名" width="150" align="center" />
-                <!-- <el-table-column prop="cover" label="头像" width="80" align="center">
-                    <template #default="scope">
-                        <div class="avatar-wrapper">
-                            <el-image
-                                :src="scope.row.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'"
-                                fit="cover" class="table-avatar"
-                                :preview-src-list="[scope.row.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png']" />
-                        </div>
-                    </template>
-                </el-table-column> -->
                 <el-table-column prop="cover" label="头像" width="80" align="center">
                     <template #default="scope">
                         <div class="avatar-wrapper">
