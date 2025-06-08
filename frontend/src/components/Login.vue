@@ -59,9 +59,9 @@ const onLogin = () => {
 
             // 发起登录请求
             request({
-                // url: "http://localhost:8088/user/login",
+                url: "http://localhost:8088/user/login",
                 // url: "https://joinup.org.cn/api-dev/user/login",
-                url: "https://joinup.org.cn/api/user/login",
+                // url: "https://joinup.org.cn/api/user/login",
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

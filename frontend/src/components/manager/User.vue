@@ -109,8 +109,8 @@
                 </el-form-item>
                 <el-form-item label="认证状态" prop="verified">
                     <el-select v-model="form.verified" placeholder="请选择认证状态">
-                        <el-option label="已认证" value="已认证" />
-                        <el-option label="未认证" value="未认证" />
+                        <el-option label="已认证" value="true" />
+                        <el-option label="未认证" value="false" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="学号" prop="studentId">

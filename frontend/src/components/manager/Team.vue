@@ -34,6 +34,7 @@
                 <el-table-column prop="id" label="序号" width="70" sortable align="center" />
                 <el-table-column prop="name" label="名称" min-width="150" show-overflow-tooltip />
                 <el-table-column prop="description" label="介绍" min-width="200" show-overflow-tooltip />
+                <el-table-column prop="currentMembersCount" label="现有人数" width="100" align="center" />
                 <el-table-column prop="maxMembers" label="最大人数" width="100" align="center" />
                 <el-table-column prop="open" label="是否公开" width="100" align="center">
                     <template #default="{ row }">
@@ -42,8 +43,7 @@
                         </el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column prop="themeId" label="主题" width="100" align="center" />
-                <el-table-column prop="tagIds" label="标签" min-width="120" show-overflow-tooltip />
+                <el-table-column prop="themeId" label="主题ID" width="100" align="center" />
 
                 <el-table-column label="操作" align="center" width="160" fixed="right">
                     <template #default="{ row }">
@@ -85,10 +85,7 @@
                     <el-switch v-model="form.open" active-text="公开" inactive-text="私有" />
                 </el-form-item>
                 <el-form-item label="主题ID" prop="themeId">
-                    <el-input-number v-model="form.themeId" :min="1" placeholder="主题ID" style="width: 100%" />
-                </el-form-item>
-                <el-form-item label="标签" prop="tagIds">
-                    <el-input v-model="form.tagIds" placeholder="请输入标签，多个标签用逗号分隔" />
+                    <el-input v-model="form.themeId" placeholder="请输入主题ID" style="width: 100%" />
                 </el-form-item>
             </el-form>
 
