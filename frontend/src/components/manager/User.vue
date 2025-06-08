@@ -48,7 +48,8 @@
                             <el-image
                                 :src="scope.row.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'"
                                 fit="cover" class="table-avatar"
-                                :preview-src-list="[scope.row.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png']" />
+                                :preview-src-list="[scope.row.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png']"
+                                :preview-teleported="true" :hide-on-click-modal="true" />
                         </div>
                     </template>
                 </el-table-column>
